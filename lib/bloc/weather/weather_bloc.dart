@@ -9,6 +9,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
   WeatherBloc()
       : super(WeatherState(
           weather: WeatherModel(),
+          lastUpdate: DateTime.now(),
         )) {
     on<WeatherGetWeatherEvent>(_onGetWeather);
     on<WeatherSetUnitsEvent>(_onSetUnits);
@@ -21,27 +22,37 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     final city = prefs.getString('city');
     final country = prefs.getString('country');
     final units = prefs.getString('units');
-    final res = await _httpClient.get(
-        'https://api.openweathermap.org/data/2.5/weather',
-        queryParameters: {
-          'q': city,
-          'units': units,
-          'appid': '476834e607173de250e2b4595cc852af',
-        });
-    if (res.statusCode == 200) {
-      emit(state.copyWith(
-        weather: WeatherModel.fromJson(res.data),
-        city: city,
-        country: country,
-        units: units,
-        isLoading: false,
-      ));
-    } else if (res.statusCode == 401) {
-      emit(state.copyWith(isError: true));
-      throw Exception('Invalid API key');
-    } else {
-      emit(state.copyWith(isError: true));
-      throw Exception('Something went wrong');
+    try {
+      final res = await _httpClient.get(
+          'https://api.openweathermap.org/data/2.5/weather',
+          queryParameters: {
+            'q': city,
+            'units': units,
+            'appid': '476834e607173de250e2b4595cc852af',
+          });
+      if (res.statusCode == 200) {
+        emit(state.copyWith(
+          weather: WeatherModel.fromJson(res.data),
+          city: city,
+          country: country,
+          units: units,
+          isLoading: false,
+          lastUpdate: DateTime.now(),
+        ));
+      } else if (res.statusCode == 401) {
+        emit(state.copyWith(isError: true));
+        throw Exception('Invalid API key');
+      } else {
+        emit(
+          state.copyWith(isError: true),
+        );
+        throw Exception('Something went wrong');
+      }
+    } on Exception catch (e) {
+      emit(
+        state.copyWith(isError: true),
+      );
+      throw Exception('Something went wrong ($e)');
     }
   }
 

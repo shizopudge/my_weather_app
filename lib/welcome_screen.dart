@@ -10,25 +10,33 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<LocalBloc, LocalState>(
+      body: BlocConsumer<LocalBloc, LocalState>(
+        listener: ((context, state) {
+          if (state.isFirstLaunch == false && !state.isLoading) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            );
+          }
+        }),
         builder: (context, state) {
-          return Center(
-            child: TextButton(
-              onPressed: () {
-                context.read<LocalBloc>().add(LocalSetLaunchStateEvent());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
+          return state.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Center(
+                  child: TextButton(
+                    onPressed: () {
+                      context.read<LocalBloc>().add(LocalSetLaunchStateEvent());
+                    },
+                    child: const Text(
+                      'Continue',
+                      style: Fonts.headerTextStyle,
+                    ),
                   ),
                 );
-              },
-              child: const Text(
-                'Continue',
-                style: Fonts.headerTextStyle,
-              ),
-            ),
-          );
         },
       ),
     );

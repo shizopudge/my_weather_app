@@ -1,21 +1,16 @@
-abstract class CititesEvent {}
+part of 'city_bloc.dart';
 
-class CityGetCititesEvent extends CititesEvent {
-  final List citites;
-  final String countryName;
+abstract class CityEvent {}
 
-  CityGetCititesEvent(this.citites, this.countryName);
-}
+class CityGetCititesEvent extends CityEvent {}
 
-class CitySearchCititesEvent extends CititesEvent {
+class CitySearchLocationEvent extends CityEvent {
   final String query;
-  final List citites;
-  final String countryName;
 
-  CitySearchCititesEvent(this.query, this.citites, this.countryName);
+  CitySearchLocationEvent(this.query);
 }
 
-class CitySetCityEvent extends CititesEvent {
+class CitySetCityEvent extends CityEvent {
   final String countryName;
   final String cityName;
 

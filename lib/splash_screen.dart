@@ -18,20 +18,20 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: BlocConsumer<LocalBloc, LocalState>(
         listener: (context, state) {
-          if (state.isFirstLaunch) {
+          if (state.isFirstLaunch && !state.isLoading) {
             Future.delayed(
               const Duration(seconds: 1),
-              (() => Navigator.push(
+              (() => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const WelcomeScreen(),
                     ),
                   )),
             );
-          } else {
+          } else if (!state.isFirstLaunch && !state.isLoading) {
             Future.delayed(
               const Duration(seconds: 1),
-              (() => Navigator.push(
+              (() => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const HomeScreen(),

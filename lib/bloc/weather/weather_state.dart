@@ -7,6 +7,7 @@ class WeatherState {
   final String city;
   final String country;
   final String units;
+  final DateTime lastUpdate;
 
   WeatherState({
     required this.weather,
@@ -15,6 +16,7 @@ class WeatherState {
     this.city = '',
     this.country = '',
     this.units = '',
+    required this.lastUpdate,
   });
 
   WeatherState copyWith({
@@ -24,6 +26,7 @@ class WeatherState {
     String? units,
     bool isLoading = false,
     bool isError = false,
+    DateTime? lastUpdate,
   }) {
     return WeatherState(
       weather: weather ?? this.weather,
@@ -32,6 +35,7 @@ class WeatherState {
       units: units ?? this.units,
       isLoading: isLoading,
       isError: isError,
+      lastUpdate: lastUpdate ?? this.lastUpdate,
     );
   }
 }

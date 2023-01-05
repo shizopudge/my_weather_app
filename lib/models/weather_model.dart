@@ -7,6 +7,7 @@ class WeatherModel {
   final int? pressure;
   final double? windSpeed;
   final int? clouds;
+  final String? icon;
 
   WeatherModel({
     this.weatherMain,
@@ -17,6 +18,7 @@ class WeatherModel {
     this.pressure,
     this.windSpeed,
     this.clouds,
+    this.icon,
   });
 
   factory WeatherModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class WeatherModel {
       pressure: json['main']['pressure'],
       windSpeed: json['wind']['speed'],
       clouds: json['clouds']['all'],
+      icon: json['weather'][0]['icon'],
     );
   }
 }
