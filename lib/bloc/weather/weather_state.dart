@@ -2,6 +2,7 @@ import 'package:my_weather_app/models/weather_model.dart';
 
 class WeatherState {
   final WeatherModel weather;
+  final List<WeatherModel> weatherList;
   final bool isLoading;
   final bool isError;
   final String city;
@@ -11,6 +12,7 @@ class WeatherState {
 
   WeatherState({
     required this.weather,
+    this.weatherList = const [],
     this.isLoading = false,
     this.isError = false,
     this.city = '',
@@ -21,6 +23,7 @@ class WeatherState {
 
   WeatherState copyWith({
     WeatherModel? weather,
+    List<WeatherModel>? weatherList,
     String? city,
     String? country,
     String? units,
@@ -30,6 +33,7 @@ class WeatherState {
   }) {
     return WeatherState(
       weather: weather ?? this.weather,
+      weatherList: weatherList ?? this.weatherList,
       city: city ?? this.city,
       country: country ?? this.country,
       units: units ?? this.units,

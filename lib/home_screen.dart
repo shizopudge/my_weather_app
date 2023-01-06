@@ -8,6 +8,7 @@ import 'package:my_weather_app/constants/images.dart';
 import 'package:my_weather_app/location_screen.dart';
 import 'package:my_weather_app/constants/font.dart';
 import 'package:my_weather_app/widgets/drawer.dart';
+import 'package:my_weather_app/widgets/weather_addition_widget.dart';
 import 'package:my_weather_app/widgets/weather_main_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,6 +17,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
     return Scaffold(
       drawer: const LeftDrawer(),
       body: SafeArea(
@@ -31,76 +33,123 @@ class HomeScreen extends StatelessWidget {
             builder: ((context, state) {
               final weather = state.weather;
               if (state.isError) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: ((context) => const LocationScreen()),
+                return NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    return [
+                      SliverAppBar(
+                        elevation: 0,
+                        floating: true,
+                        snap: true,
+                        collapsedHeight: height * .15,
+                        expandedHeight: height * .25,
+                        centerTitle: true,
+                        leadingWidth: 35,
+                        backgroundColor: Colors.transparent,
+                        leading: InkWell(
+                          radius: 100,
+                          borderRadius: BorderRadius.circular(21),
+                          onTap: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                          child: const Icon(
+                            Icons.menu,
+                            size: 32,
+                            color: Colors.white,
                           ),
-                        );
-                      },
-                      child: const Text(
-                        'Change location',
-                        style: Fonts.headerTextStyle,
-                      ),
-                    ),
-                    Image.asset(
-                      'assets/icons/cloud.png',
-                      height: height * .35,
-                    ),
-                    const Text(
-                      'Something went wrong...',
-                      textAlign: TextAlign.center,
-                      style: Fonts.msgTextStyle,
-                    ),
-                  ],
-                );
-              }
-              if (state.isLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              if (!state.isError && !state.isLoading) {
-                return RefreshIndicator(
-                  color: Colors.white,
-                  backgroundColor: Colors.black,
-                  onRefresh: () async {
-                    context.read<WeatherBloc>().add(WeatherGetWeatherEvent());
-                  },
-                  child: NestedScrollView(
-                    headerSliverBuilder: (context, innerBoxIsScrolled) {
-                      return [
-                        SliverAppBar(
-                          elevation: 0,
-                          floating: true,
-                          snap: true,
-                          collapsedHeight: height * .15,
-                          expandedHeight: height * .25,
-                          centerTitle: true,
-                          leadingWidth: 35,
-                          backgroundColor: Colors.transparent,
-                          leading: InkWell(
+                        ),
+                        actions: [
+                          InkWell(
                             radius: 100,
                             borderRadius: BorderRadius.circular(21),
                             onTap: () {
-                              Scaffold.of(context).openDrawer();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: ((context) =>
+                                      const LocationScreen()),
+                                ),
+                              );
                             },
                             child: const Icon(
-                              Icons.menu,
+                              Icons.add_rounded,
                               size: 32,
+                              color: Colors.white,
                             ),
                           ),
-                          actions: [
-                            InkWell(
-                              radius: 100,
-                              borderRadius: BorderRadius.circular(21),
-                              onTap: () {
+                        ],
+                        flexibleSpace: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    state.city,
+                                    textAlign: TextAlign.center,
+                                    style: Fonts.headerTextStyle.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    state.country,
+                                    textAlign: TextAlign.center,
+                                    style: Fonts.msgTextStyle.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Last update:',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle.copyWith(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${DateFormat('MMMEd').format(state.lastUpdate)}, ',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle.copyWith(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        DateFormat('HH:mm')
+                                            .format(state.lastUpdate),
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle.copyWith(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ];
+                  },
+                  body: RefreshIndicator(
+                    color: Colors.white,
+                    backgroundColor: Colors.black,
+                    onRefresh: () async {
+                      context.read<WeatherBloc>().add(WeatherGetWeatherEvent());
+                    },
+                    child: SingleChildScrollView(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -109,106 +158,157 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 );
                               },
-                              child: const Icon(
-                                Icons.add_rounded,
-                                size: 32,
+                              child: const Text(
+                                'Change location',
+                                style: Fonts.headerTextStyle,
+                              ),
+                            ),
+                            Image.asset(
+                              'assets/icons/cloud.png',
+                              height: height * .35,
+                            ),
+                            Text(
+                              'Something went wrong...',
+                              textAlign: TextAlign.center,
+                              style: Fonts.msgTextStyle.copyWith(
+                                color: Colors.white,
                               ),
                             ),
                           ],
-                          flexibleSpace: Stack(
-                            children: [
-                              Align(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      state.city,
-                                      textAlign: TextAlign.center,
-                                      style: Fonts.headerTextStyle,
-                                    ),
-                                    Text(
-                                      state.country,
-                                      textAlign: TextAlign.center,
-                                      style: Fonts.msgTextStyle,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Last update:',
-                                          textAlign: TextAlign.center,
-                                          style: Fonts.msgTextStyle
-                                              .copyWith(fontSize: 16),
-                                        ),
-                                        Text(
-                                          '${DateFormat('MMMEd').format(state.lastUpdate)}, ',
-                                          textAlign: TextAlign.center,
-                                          style: Fonts.msgTextStyle
-                                              .copyWith(fontSize: 16),
-                                        ),
-                                        Text(
-                                          DateFormat('HH:mm')
-                                              .format(state.lastUpdate),
-                                          textAlign: TextAlign.center,
-                                          style: Fonts.msgTextStyle
-                                              .copyWith(fontSize: 16),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+
+              if (state.isLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (!state.isError && !state.isLoading && !isKeyboard) {
+                return NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    return [
+                      SliverAppBar(
+                        elevation: 0,
+                        floating: true,
+                        snap: true,
+                        collapsedHeight: height * .15,
+                        expandedHeight: height * .25,
+                        centerTitle: true,
+                        leadingWidth: 35,
+                        backgroundColor: Colors.transparent,
+                        leading: InkWell(
+                          radius: 100,
+                          borderRadius: BorderRadius.circular(21),
+                          onTap: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                          child: const Icon(
+                            Icons.menu,
+                            size: 32,
+                            color: Colors.white,
                           ),
                         ),
-                      ];
-                    },
-                    body: Column(
-                      children: [
-                        WeatherMainWidget(
-                          weather: weather,
+                        actions: [
+                          InkWell(
+                            radius: 100,
+                            borderRadius: BorderRadius.circular(21),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: ((context) =>
+                                      const LocationScreen()),
+                                ),
+                              );
+                            },
+                            child: const Icon(
+                              Icons.add_rounded,
+                              size: 32,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                        flexibleSpace: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    state.city,
+                                    textAlign: TextAlign.center,
+                                    style: Fonts.headerTextStyle.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    state.country,
+                                    textAlign: TextAlign.center,
+                                    style: Fonts.msgTextStyle.copyWith(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Last update:',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle.copyWith(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${DateFormat('MMMEd').format(state.lastUpdate)}, ',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle.copyWith(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        DateFormat('HH:mm')
+                                            .format(state.lastUpdate),
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle.copyWith(
+                                          fontSize: 14,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        // TextButton(
-                        //   onPressed: () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: ((context) => const LocationScreen()),
-                        //       ),
-                        //     );
-                        //   },
-                        //   child: Text(
-                        //     state.city,
-                        //     style: Fonts.headerTextStyle,
-                        //   ),
-                        // ),
-                        // TextButton(
-                        //     onPressed: () {
-                        //       showModalBottomSheet(
-                        //           elevation: 16,
-                        //           shape: const RoundedRectangleBorder(
-                        //             borderRadius: BorderRadius.only(
-                        //               topLeft: Radius.circular(15),
-                        //               topRight: Radius.circular(15),
-                        //             ),
-                        //           ),
-                        //           context: context,
-                        //           builder: ((context) {
-                        //             return UnitsChooseBottomSheet(
-                        //               unitsType: state.units,
-                        //             );
-                        //           }));
-                        //     },
-                        //     child: Text(state.units)),
-                        // Text(
-                        //   weather.temp.toString(),
-                        // ),
-                        // Text(
-                        //   weather.weatherMain ?? 'none',
-                        // ),
-                      ],
+                      ),
+                    ];
+                  },
+                  body: RefreshIndicator(
+                    color: Colors.white,
+                    backgroundColor: Colors.black,
+                    onRefresh: () async {
+                      context.read<WeatherBloc>().add(WeatherGetWeatherEvent());
+                    },
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          WeatherMainWidget(
+                            weather: weather,
+                            weatherList: state.weatherList,
+                          ),
+                          WeatherAdditionWidget(
+                            weather: weather,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

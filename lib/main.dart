@@ -28,9 +28,8 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => WeatherBloc()
-            ..add(
-              WeatherGetWeatherEvent(),
-            ),
+            ..add(WeatherGetWeatherEvent())
+            ..add(WeatherGetSeveralWeatherEvent()),
         ),
         BlocProvider(
           create: (context) => CityBloc()..add(CityGetCititesEvent()),

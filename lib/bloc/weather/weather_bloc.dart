@@ -13,6 +13,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         )) {
     on<WeatherGetWeatherEvent>(_onGetWeather);
     on<WeatherSetUnitsEvent>(_onSetUnits);
+    on<WeatherGetSeveralWeatherEvent>(_onGetSeveralWeather);
   }
   final _httpClient = Dio();
   Future _onGetWeather(
@@ -59,5 +60,77 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
   _onSetUnits(WeatherSetUnitsEvent event, Emitter<WeatherState> emit) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('units', event.units);
+  }
+
+  Future _onGetSeveralWeather(
+      WeatherGetSeveralWeatherEvent event, Emitter<WeatherState> emit) async {
+    emit(state.copyWith(isLoading: true));
+    final prefs = await SharedPreferences.getInstance();
+    final city = prefs.getString('city');
+    final units = prefs.getString('units');
+    final List<WeatherModel> weatherList = [];
+    const count = 10;
+    try {
+      if (event.count == null) {
+        final res = await _httpClient.get(
+            'https://api.openweathermap.org/data/2.5/forecast?',
+            queryParameters: {
+              'q': city,
+              'units': units,
+              'appid': '476834e607173de250e2b4595cc852af',
+              'cnt': count,
+            });
+        for (var i = 0; i < count; i++) {
+          weatherList.add(WeatherModel.fromJson(res.data['list'][i]));
+        }
+        if (res.statusCode == 200) {
+          emit(state.copyWith(
+            weatherList: weatherList,
+            isLoading: false,
+            lastUpdate: DateTime.now(),
+          ));
+        } else if (res.statusCode == 401) {
+          emit(state.copyWith(isError: true));
+          throw Exception('Invalid API key');
+        } else {
+          emit(
+            state.copyWith(isError: true),
+          );
+          throw Exception('Something went wrong');
+        }
+      } else {
+        final res = await _httpClient.get(
+            'https://api.openweathermap.org/data/2.5/forecast?',
+            queryParameters: {
+              'q': city,
+              'units': units,
+              'appid': '476834e607173de250e2b4595cc852af',
+              'cnt': event.count,
+            });
+        for (var i = 0; i < count; i++) {
+          weatherList.add(WeatherModel.fromJson(res.data['list'][i]));
+        }
+        if (res.statusCode == 200) {
+          emit(state.copyWith(
+            weatherList: weatherList,
+            isLoading: false,
+            lastUpdate: DateTime.now(),
+          ));
+        } else if (res.statusCode == 401) {
+          emit(state.copyWith(isError: true));
+          throw Exception('Invalid API key');
+        } else {
+          emit(
+            state.copyWith(isError: true),
+          );
+          throw Exception('Something went wrong');
+        }
+      }
+    } on Exception catch (e) {
+      emit(
+        state.copyWith(isError: true),
+      );
+      throw Exception('Something went wrong ($e)');
+    }
   }
 }
