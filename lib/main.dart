@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_weather_app/bloc/city/city_bloc.dart';
 import 'package:my_weather_app/bloc/local/local_bloc.dart';
+import 'package:my_weather_app/bloc/preload/preload_bloc.dart';
 import 'package:my_weather_app/bloc/settings/settings_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
@@ -27,9 +28,16 @@ class MyApp extends StatelessWidget {
           lazy: false,
         ),
         BlocProvider(
+          create: (context) => PreloadBloc()
+            ..add(
+              PreloadPrecacheImagesEvent(context),
+            ),
+        ),
+        BlocProvider(
           create: (context) => WeatherBloc()
             ..add(WeatherGetWeatherEvent())
-            ..add(WeatherGetSeveralWeatherEvent()),
+            ..add(WeatherGet24hWeatherEvent())
+            ..add(WeatherGetWeekWeatherEvent()),
         ),
         BlocProvider(
           create: (context) => CityBloc()..add(CityGetCititesEvent()),

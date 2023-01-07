@@ -35,9 +35,7 @@ class WeatherAdditionWidget extends StatelessWidget {
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Divider(
-                thickness: 2,
-              ),
+              child: Divider(),
             ),
             AdditionInfoListTile(
               trailing: DateFormat('HH:mm').format(
@@ -49,9 +47,7 @@ class WeatherAdditionWidget extends StatelessWidget {
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Divider(
-                thickness: 2,
-              ),
+              child: Divider(),
             ),
             AdditionInfoListTile(
               trailing: '${weather.humidity}%',
@@ -60,9 +56,7 @@ class WeatherAdditionWidget extends StatelessWidget {
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Divider(
-                thickness: 2,
-              ),
+              child: Divider(),
             ),
             BlocSelector<WeatherBloc, WeatherState, String>(
               selector: (state) {
@@ -86,9 +80,7 @@ class WeatherAdditionWidget extends StatelessWidget {
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Divider(
-                thickness: 2,
-              ),
+              child: Divider(),
             ),
             AdditionInfoListTile(
               trailing: '${weather.clouds}%',
@@ -97,9 +89,7 @@ class WeatherAdditionWidget extends StatelessWidget {
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Divider(
-                thickness: 2,
-              ),
+              child: Divider(),
             ),
             AdditionInfoListTile(
               trailing: '${weather.pressure} hPa',

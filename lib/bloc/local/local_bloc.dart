@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:my_weather_app/constants/images.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'local_event.dart';
@@ -45,8 +47,10 @@ class LocalBloc extends Bloc<LocalEvent, LocalState> {
     final prefs = await SharedPreferences.getInstance();
     final isFirstLaunch = prefs.getBool('isFirstLaunch');
     final theme = prefs.getString('theme') ?? 'light';
+
     if (isFirstLaunch ?? true) {
       prefs.setString('theme', 'light');
+
       emit(
         state.copyWith(
           isFirstLaunch: true,

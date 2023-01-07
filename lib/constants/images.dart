@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ConstImages {
-  static const AssetImage mainBg = AssetImage(
-    'assets/images/main-bg.jpg',
+  static const AssetImage bg = AssetImage(
+    'assets/images/bg.jpg',
   );
   static const AssetImage sunset = AssetImage(
     'assets/icons/sunset.png',

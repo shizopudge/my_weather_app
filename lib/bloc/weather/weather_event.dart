@@ -1,33 +1,15 @@
 abstract class WeatherEvent {}
 
-class WeatherGetWeatherEvent extends WeatherEvent {
-  final String? city;
-  final String? country;
-  final String? units;
+class WeatherGetWeatherEvent extends WeatherEvent {}
 
-  WeatherGetWeatherEvent({
-    this.city,
-    this.country,
-    this.units,
-  });
-}
+class WeatherGet24hWeatherEvent extends WeatherEvent {}
 
-class WeatherGetSeveralWeatherEvent extends WeatherEvent {
-  final String? city;
-  final String? country;
-  final String? units;
-  final int? count;
-
-  WeatherGetSeveralWeatherEvent({
-    this.city,
-    this.country,
-    this.units,
-    this.count,
-  });
-}
+class WeatherGetWeekWeatherEvent extends WeatherEvent {}
 
 class WeatherSetUnitsEvent extends WeatherEvent {
   final String units;
 
   WeatherSetUnitsEvent({required this.units});
 }
+
+class WeatherOnErrorEvent extends WeatherEvent {}

@@ -22,20 +22,7 @@ class SettingsScreen extends StatelessWidget {
               SliverAppBar(
                 elevation: 0,
                 backgroundColor: Colors.transparent,
-                floating: true,
-                snap: true,
                 expandedHeight: height * .2,
-                centerTitle: true,
-                leading: InkWell(
-                  radius: 100,
-                  borderRadius: BorderRadius.circular(21),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(
-                    Icons.arrow_back_ios,
-                  ),
-                ),
                 flexibleSpace: Stack(
                   children: const [
                     Align(
@@ -83,7 +70,10 @@ class SettingsScreen extends StatelessWidget {
                                       WeatherGetWeatherEvent(),
                                     );
                                 context.read<WeatherBloc>().add(
-                                      WeatherGetSeveralWeatherEvent(),
+                                      WeatherGet24hWeatherEvent(),
+                                    );
+                                context.read<WeatherBloc>().add(
+                                      WeatherGetWeekWeatherEvent(),
                                     );
                                 break;
                               case 1:
@@ -95,7 +85,10 @@ class SettingsScreen extends StatelessWidget {
                                       WeatherGetWeatherEvent(),
                                     );
                                 context.read<WeatherBloc>().add(
-                                      WeatherGetSeveralWeatherEvent(),
+                                      WeatherGet24hWeatherEvent(),
+                                    );
+                                context.read<WeatherBloc>().add(
+                                      WeatherGetWeekWeatherEvent(),
                                     );
                                 break;
                               default:

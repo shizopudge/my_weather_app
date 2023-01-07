@@ -15,7 +15,7 @@ class AppTheme {
       thickness: 1,
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: Colors.white,
+      color: Colors.indigo,
     ),
     appBarTheme: const AppBarTheme(
       iconTheme: IconThemeData(
@@ -27,7 +27,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(21),
       ),
       margin: const EdgeInsets.all(4),
-      color: Colors.white,
+      color: Colors.white70,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -51,7 +51,10 @@ class AppTheme {
       fillColor: Colors.indigo,
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: Colors.white,
+      color: Colors.indigo,
+    ),
+    drawerTheme: const DrawerThemeData(
+      backgroundColor: Colors.black,
     ),
     cardTheme: CardTheme(
       shape: RoundedRectangleBorder(

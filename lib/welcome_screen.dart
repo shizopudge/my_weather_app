@@ -9,7 +9,10 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme =
+        context.select<LocalBloc, String>((value) => value.state.theme);
     return Scaffold(
+      backgroundColor: theme == 'light' ? Colors.white : Colors.black,
       body: BlocConsumer<LocalBloc, LocalState>(
         listener: ((context, state) {
           if (state.isFirstLaunch == false && !state.isLoading) {

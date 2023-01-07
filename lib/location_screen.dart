@@ -25,6 +25,8 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme =
+        context.select<LocalBloc, String>((value) => value.state.theme);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -36,7 +38,10 @@ class _LocationScreenState extends State<LocationScreen> {
         if (!state.isLoading) {
           context.read<WeatherBloc>().add(WeatherGetWeatherEvent());
           context.read<WeatherBloc>().add(
-                WeatherGetSeveralWeatherEvent(),
+                WeatherGet24hWeatherEvent(),
+              );
+          context.read<WeatherBloc>().add(
+                WeatherGetWeekWeatherEvent(),
               );
         }
       }, builder: (context, state) {
@@ -160,6 +165,9 @@ class _LocationScreenState extends State<LocationScreen> {
                     _searchController.text.isNotEmpty)
                   Expanded(
                     child: Card(
+                      color: theme == 'dark'
+                          ? Colors.grey.shade900
+                          : Colors.grey.shade300,
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: ListView.builder(

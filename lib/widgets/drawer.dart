@@ -41,15 +41,15 @@ class LeftDrawer extends StatelessWidget {
                             );
                       },
                       child: theme == 'light'
-                          ? Icon(
+                          ? const Icon(
                               Icons.sunny,
                               size: 32,
-                              color: Colors.orange.shade500,
+                              color: Colors.indigo,
                             )
                           : const Icon(
                               Icons.nightlight,
                               size: 32,
-                              color: Colors.black87,
+                              color: Colors.indigo,
                             ),
                     ),
                   ),
@@ -98,7 +98,10 @@ class LeftDrawer extends StatelessWidget {
                                             WeatherGetWeatherEvent(),
                                           );
                                       context.read<WeatherBloc>().add(
-                                            WeatherGetSeveralWeatherEvent(),
+                                            WeatherGet24hWeatherEvent(),
+                                          );
+                                      context.read<WeatherBloc>().add(
+                                            WeatherGetWeekWeatherEvent(),
                                           );
                                       break;
                                     case 1:
@@ -111,7 +114,10 @@ class LeftDrawer extends StatelessWidget {
                                             WeatherGetWeatherEvent(),
                                           );
                                       context.read<WeatherBloc>().add(
-                                            WeatherGetSeveralWeatherEvent(),
+                                            WeatherGet24hWeatherEvent(),
+                                          );
+                                      context.read<WeatherBloc>().add(
+                                            WeatherGetWeekWeatherEvent(),
                                           );
                                       break;
                                     default:
