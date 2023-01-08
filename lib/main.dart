@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_weather_app/bloc/city/city_bloc.dart';
 import 'package:my_weather_app/bloc/local/local_bloc.dart';
+import 'package:my_weather_app/bloc/locations/locations_bloc.dart';
 import 'package:my_weather_app/bloc/preload/preload_bloc.dart';
 import 'package:my_weather_app/bloc/settings/settings_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
@@ -10,6 +11,7 @@ import 'package:my_weather_app/constants/theme.dart';
 import 'package:my_weather_app/splash_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -26,6 +28,12 @@ class MyApp extends StatelessWidget {
               LocalGetLaunchStateEvent(),
             ),
           lazy: false,
+        ),
+        BlocProvider(
+          create: (context) => LocationsBloc()
+            ..add(
+              LocationsGetLocationsEvent(),
+            ),
         ),
         BlocProvider(
           create: (context) => PreloadBloc()

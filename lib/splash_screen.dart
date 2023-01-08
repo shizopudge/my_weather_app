@@ -32,7 +32,9 @@ class SplashScreen extends StatelessWidget {
                       ),
                     )),
               );
-            } else if (!state.isFirstLaunch && !state.isLoading) {
+            } else if (!state.isFirstLaunch &&
+                !state.isLoading &&
+                !isImagesPreloading) {
               Future.delayed(
                 const Duration(seconds: 1),
                 (() => Navigator.pushReplacement(

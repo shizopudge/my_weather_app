@@ -1,8 +1,6 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_weather_app/constants/images.dart';
-
 part 'preload_event.dart';
 part 'preload_state.dart';
 

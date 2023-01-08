@@ -23,14 +23,10 @@ class WeatherWeekWeidget extends StatelessWidget {
       margin: const EdgeInsets.all(15),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          height: 300,
-          child: ListView.builder(
-            itemCount: weatherWeekList.length,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: ((context, index) {
-              final weather = weatherWeekList[index];
-              return ListTile(
+        child: Column(
+          children: [
+            ...weatherWeekList.map(
+              (weather) => ListTile(
                 leading: SizedBox(
                   width: 80,
                   child: Text(
@@ -120,90 +116,11 @@ class WeatherWeekWeidget extends StatelessWidget {
                           ),
                       ],
                     ),
-                    // Row(
-                    //   children: [
-                    //     Row(
-                    //       crossAxisAlignment: CrossAxisAlignment.start,
-                    //       children: [
-                    //         Text(
-                    //           weather.avgMinTemp ?? '',
-                    //           style: Fonts.msgTextStyle.copyWith(
-                    //             fontSize: 14,
-                    //           ),
-                    //         ),
-                    //         if (units == 'metric')
-                    //           Image.asset(
-                    //             'assets/icons/celsius.png',
-                    //             height: 7,
-                    //             color:
-                    //                 theme == 'dark' ? Colors.white : Colors.black,
-                    //           ),
-                    //         if (units == 'imperial')
-                    //           Image.asset(
-                    //             'assets/icons/fahrenheit.png',
-                    //             height: 7,
-                    //             color:
-                    //                 theme == 'dark' ? Colors.white : Colors.black,
-                    //           ),
-                    //       ],
-                    //     ),
-                    //     Row(
-                    //       crossAxisAlignment: CrossAxisAlignment.start,
-                    //       children: [
-                    //         Text(
-                    //           '/${weather.avgMaxTemp}',
-                    //           style: Fonts.msgTextStyle.copyWith(
-                    //             fontSize: 14,
-                    //           ),
-                    //         ),
-                    //         if (units == 'metric')
-                    //           Image.asset(
-                    //             'assets/icons/celsius.png',
-                    //             height: 7,
-                    //             color:
-                    //                 theme == 'dark' ? Colors.white : Colors.black,
-                    //           ),
-                    //         if (units == 'imperial')
-                    //           Image.asset(
-                    //             'assets/icons/fahrenheit.png',
-                    //             height: 7,
-                    //             color:
-                    //                 theme == 'dark' ? Colors.white : Colors.black,
-                    //           ),
-                    //       ],
-                    //     ),
-                    //     Row(
-                    //       crossAxisAlignment: CrossAxisAlignment.start,
-                    //       children: [
-                    //         Text(
-                    //           '/${weather.avgTemp}',
-                    //           style: Fonts.msgTextStyle.copyWith(
-                    //             fontSize: 14,
-                    //           ),
-                    //         ),
-                    //         if (units == 'metric')
-                    //           Image.asset(
-                    //             'assets/icons/celsius.png',
-                    //             height: 7,
-                    //             color:
-                    //                 theme == 'dark' ? Colors.white : Colors.black,
-                    //           ),
-                    //         if (units == 'imperial')
-                    //           Image.asset(
-                    //             'assets/icons/fahrenheit.png',
-                    //             height: 7,
-                    //             color:
-                    //                 theme == 'dark' ? Colors.white : Colors.black,
-                    //           ),
-                    //       ],
-                    //     ),
-                    //   ],
-                    // ),
                   ],
                 ),
-              );
-            }),
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

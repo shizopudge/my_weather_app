@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_weather_app/bloc/city/city_bloc.dart';
 import 'package:my_weather_app/bloc/local/local_bloc.dart';
+import 'package:my_weather_app/bloc/locations/locations_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/constants/font.dart';
@@ -43,6 +44,7 @@ class _LocationScreenState extends State<LocationScreen> {
           context.read<WeatherBloc>().add(
                 WeatherGetWeekWeatherEvent(),
               );
+          context.read<LocationsBloc>().add(LocationsGetLocationsEvent());
         }
       }, builder: (context, state) {
         final cities = state.searchedCities ?? [];
@@ -183,6 +185,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                                 city.countryName ?? '',
                                                 city.cityName ?? ''),
                                           );
+                                      context.read<LocationsBloc>().add(
+                                            LocationsOnSetLocationEvent(
+                                              city.cityName ?? '',
+                                              city.countryName ?? '',
+                                            ),
+                                          );
                                       Navigator.pop(context);
                                     },
                                     child: LocationWidget(
@@ -198,6 +206,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                               CitySetCityEvent(
                                                   city.countryName ?? '',
                                                   city.cityName ?? ''));
+                                          context.read<LocationsBloc>().add(
+                                                LocationsOnSetLocationEvent(
+                                                  city.cityName ?? '',
+                                                  city.countryName ?? '',
+                                                ),
+                                              );
                                           Navigator.pop(context);
                                         },
                                         child: LocationWidget(

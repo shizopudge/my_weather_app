@@ -158,10 +158,8 @@ class HomeScreen extends StatelessWidget {
                           );
                     },
                     child: SingleChildScrollView(
-                      child: Align(
-                        alignment: Alignment.center,
+                      child: Center(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
                               'assets/icons/cloud.png',
@@ -200,9 +198,17 @@ class HomeScreen extends StatelessWidget {
                       weatherWeekList == [] ||
                       weather24hList == [])) {
                 return Center(
-                  child: Image.asset(
-                    'assets/icons/cloud.png',
-                    height: height * .35,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/icons/cloud.png',
+                        height: height * .35,
+                      ),
+                      const CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 );
               }
@@ -539,9 +545,17 @@ class HomeScreen extends StatelessWidget {
                   });
                 }
                 return Center(
-                  child: Image.asset(
-                    'assets/icons/cloud.png',
-                    height: height * .35,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/icons/cloud.png',
+                        height: height * .35,
+                      ),
+                      const CircularProgressIndicator(
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 );
               }

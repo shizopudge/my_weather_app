@@ -1,8 +1,10 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
-import 'package:my_weather_app/constants/images.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_weather_app/models/city_model.dart';
+import 'package:my_weather_app/models/location_model.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 
 part 'local_event.dart';
 part 'local_state.dart';
@@ -28,6 +30,19 @@ class LocalBloc extends Bloc<LocalEvent, LocalState> {
         'imperial',
       ],
     );
+    final db = await openDatabase(
+      join(await getDatabasesPath(), 'locations.db'),
+      onCreate: (db, version) {
+        db.execute(
+          'CREATE TABLE locations(id INTEGER PRIMARY KEY autoincrement, city TEXT unique, country TEXT)',
+        );
+        db.execute(
+            'create table favorite_locations(id INTEGER PRIMARY KEY autoincrement, city TEXT unique, country TEXT)');
+      },
+      version: 1,
+    );
+    await db.insert(
+        'locations', LocationModel(city: 'Moscow', country: 'Russia').toMap());
     await prefs.setBool('isFirstLaunch', false);
     emit(
       state.copyWith(
@@ -47,10 +62,8 @@ class LocalBloc extends Bloc<LocalEvent, LocalState> {
     final prefs = await SharedPreferences.getInstance();
     final isFirstLaunch = prefs.getBool('isFirstLaunch');
     final theme = prefs.getString('theme') ?? 'light';
-
     if (isFirstLaunch ?? true) {
       prefs.setString('theme', 'light');
-
       emit(
         state.copyWith(
           isFirstLaunch: true,
