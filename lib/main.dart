@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_weather_app/bloc/city/city_bloc.dart';
 import 'package:my_weather_app/bloc/local/local_bloc.dart';
-import 'package:my_weather_app/bloc/locations/locations_bloc.dart';
 import 'package:my_weather_app/bloc/preload/preload_bloc.dart';
 import 'package:my_weather_app/bloc/settings/settings_bloc.dart';
+import 'package:my_weather_app/bloc/sqflite/sqflite_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/constants/theme.dart';
 import 'package:my_weather_app/splash_screen.dart';
+
+import 'bloc/location/location_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,25 +31,23 @@ class MyApp extends StatelessWidget {
           lazy: false,
         ),
         BlocProvider(
-          create: (context) => LocationsBloc()
-            ..add(
-              LocationsGetLocationsEvent(),
-            ),
+          create: (context) => SqfliteBloc(),
         ),
         BlocProvider(
           create: (context) => PreloadBloc()
             ..add(
               PreloadPrecacheImagesEvent(context),
             ),
+          lazy: false,
         ),
         BlocProvider(
           create: (context) => WeatherBloc()
-            ..add(WeatherGetWeatherEvent())
-            ..add(WeatherGet24hWeatherEvent())
-            ..add(WeatherGetWeekWeatherEvent()),
+            ..add(WeatherInitGetWeatherEvent())
+            ..add(WeatherInitGet24hWeatherEvent())
+            ..add(WeatherInitGetWeekWeatherEvent()),
         ),
         BlocProvider(
-          create: (context) => CityBloc()..add(CityGetCititesEvent()),
+          create: (context) => LocationBloc()..add(LocationGetCititesEvent()),
           lazy: false,
         ),
         BlocProvider(

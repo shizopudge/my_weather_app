@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_weather_app/models/city_model.dart';
 import 'package:my_weather_app/models/location_model.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,10 +33,10 @@ class LocalBloc extends Bloc<LocalEvent, LocalState> {
       join(await getDatabasesPath(), 'locations.db'),
       onCreate: (db, version) {
         db.execute(
-          'CREATE TABLE locations(id INTEGER PRIMARY KEY autoincrement, city TEXT unique, country TEXT)',
+          'CREATE TABLE locations(id INTEGER PRIMARY KEY autoincrement, city TEXT, country TEXT)',
         );
         db.execute(
-            'create table favorite_locations(id INTEGER PRIMARY KEY autoincrement, city TEXT unique, country TEXT)');
+            'create table favorite_locations(id INTEGER PRIMARY KEY autoincrement, city TEXT, country TEXT)');
       },
       version: 1,
     );

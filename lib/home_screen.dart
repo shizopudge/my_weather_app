@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:my_weather_app/bloc/local/local_bloc.dart';
+import 'package:my_weather_app/bloc/sqflite/sqflite_bloc.dart';
+import 'package:my_weather_app/bloc/sqflite/sqflite_event.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/bloc/weather/weather_state.dart';
@@ -24,21 +26,21 @@ class HomeScreen extends StatelessWidget {
         context.select<LocalBloc, String>((value) => value.state.theme);
     return Scaffold(
       drawer: const LeftDrawer(),
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: ConstImages.bg,
-              colorFilter: theme == 'dark'
-                  ? const ColorFilter.mode(
-                      Colors.blue,
-                      BlendMode.darken,
-                    )
-                  : null,
-              filterQuality: FilterQuality.high,
-              fit: BoxFit.cover,
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: ConstImages.bg,
+            colorFilter: theme == 'dark'
+                ? const ColorFilter.mode(
+                    Colors.cyan,
+                    BlendMode.darken,
+                  )
+                : null,
+            filterQuality: FilterQuality.high,
+            fit: BoxFit.cover,
           ),
+        ),
+        child: SafeArea(
           child: BlocBuilder<WeatherBloc, WeatherState>(
             builder: ((context, state) {
               final weather = state.weather;
@@ -58,6 +60,9 @@ class HomeScreen extends StatelessWidget {
                           radius: 100,
                           borderRadius: BorderRadius.circular(21),
                           onTap: () {
+                            context
+                                .read<SqfliteBloc>()
+                                .add(SqfliteGetLocationsEvent());
                             Scaffold.of(context).openDrawer();
                           },
                           child: const Icon(
@@ -106,36 +111,6 @@ class HomeScreen extends StatelessWidget {
                                     style: Fonts.msgTextStyle.copyWith(
                                       color: Colors.white,
                                     ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Last update:',
-                                        textAlign: TextAlign.center,
-                                        style: Fonts.msgTextStyle.copyWith(
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${DateFormat('MMMEd').format(state.lastUpdate)}, ',
-                                        textAlign: TextAlign.center,
-                                        style: Fonts.msgTextStyle.copyWith(
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Text(
-                                        DateFormat('HH:mm')
-                                            .format(state.lastUpdate),
-                                        textAlign: TextAlign.center,
-                                        style: Fonts.msgTextStyle.copyWith(
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ],
                               ),
@@ -198,17 +173,9 @@ class HomeScreen extends StatelessWidget {
                       weatherWeekList == [] ||
                       weather24hList == [])) {
                 return Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/icons/cloud.png',
-                        height: height * .35,
-                      ),
-                      const CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                    ],
+                  child: Image.asset(
+                    'assets/icons/cloud.png',
+                    height: height * .35,
                   ),
                 );
               }
@@ -265,6 +232,9 @@ class HomeScreen extends StatelessWidget {
                             radius: 100,
                             borderRadius: BorderRadius.circular(21),
                             onTap: () {
+                              context
+                                  .read<SqfliteBloc>()
+                                  .add(SqfliteGetLocationsEvent());
                               Scaffold.of(context).openDrawer();
                             },
                             child: const Icon(
@@ -327,7 +297,7 @@ class HomeScreen extends StatelessWidget {
                                           ),
                                         ),
                                         Text(
-                                          '${DateFormat('MMMEd').format(state.lastUpdate)}, ',
+                                          '${DateFormat('MMMEd').format(DateTime.fromMillisecondsSinceEpoch((weather.dt ?? 0) * 1000))}, ',
                                           textAlign: TextAlign.center,
                                           style: Fonts.msgTextStyle.copyWith(
                                             fontSize: 14,
@@ -335,8 +305,9 @@ class HomeScreen extends StatelessWidget {
                                           ),
                                         ),
                                         Text(
-                                          DateFormat('HH:mm')
-                                              .format(state.lastUpdate),
+                                          DateFormat('HH:mm').format(DateTime
+                                              .fromMillisecondsSinceEpoch(
+                                                  (weather.dt ?? 0) * 1000)),
                                           textAlign: TextAlign.center,
                                           style: Fonts.msgTextStyle.copyWith(
                                             fontSize: 14,
@@ -403,159 +374,121 @@ class HomeScreen extends StatelessWidget {
                     weather.windSpeed == null ||
                     weatherWeekList == [] ||
                     weather24hList == []) {
-                  Future.delayed(const Duration(seconds: 5), () {
-                    return NestedScrollView(
-                      headerSliverBuilder: (context, innerBoxIsScrolled) {
-                        return [
-                          SliverAppBar(
-                            elevation: 0,
-                            collapsedHeight: height * .15,
-                            expandedHeight: height * .25,
-                            leadingWidth: 35,
-                            backgroundColor: Colors.transparent,
-                            leading: InkWell(
+                  return NestedScrollView(
+                    headerSliverBuilder: (context, innerBoxIsScrolled) {
+                      return [
+                        SliverAppBar(
+                          elevation: 0,
+                          collapsedHeight: height * .15,
+                          expandedHeight: height * .25,
+                          leadingWidth: 35,
+                          backgroundColor: Colors.transparent,
+                          leading: InkWell(
+                            radius: 100,
+                            borderRadius: BorderRadius.circular(21),
+                            onTap: () {
+                              context
+                                  .read<SqfliteBloc>()
+                                  .add(SqfliteGetLocationsEvent());
+                              Scaffold.of(context).openDrawer();
+                            },
+                            child: const Icon(
+                              Icons.menu,
+                              size: 32,
+                              color: Colors.white,
+                            ),
+                          ),
+                          actions: [
+                            InkWell(
                               radius: 100,
                               borderRadius: BorderRadius.circular(21),
                               onTap: () {
-                                Scaffold.of(context).openDrawer();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: ((context) =>
+                                        const LocationScreen()),
+                                  ),
+                                );
                               },
                               child: const Icon(
-                                Icons.menu,
+                                Icons.add_rounded,
                                 size: 32,
                                 color: Colors.white,
                               ),
                             ),
-                            actions: [
-                              InkWell(
-                                radius: 100,
-                                borderRadius: BorderRadius.circular(21),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: ((context) =>
-                                          const LocationScreen()),
+                          ],
+                          flexibleSpace: Stack(
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      state.city,
+                                      textAlign: TextAlign.center,
+                                      style: Fonts.headerTextStyle.copyWith(
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  );
-                                },
-                                child: const Icon(
-                                  Icons.add_rounded,
-                                  size: 32,
+                                    Text(
+                                      state.country,
+                                      textAlign: TextAlign.center,
+                                      style: Fonts.msgTextStyle.copyWith(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ];
+                    },
+                    body: RefreshIndicator(
+                      color: Colors.white,
+                      backgroundColor: Colors.black,
+                      onRefresh: () async {
+                        context
+                            .read<WeatherBloc>()
+                            .add(WeatherGetWeatherEvent());
+                        context
+                            .read<WeatherBloc>()
+                            .add(WeatherGet24hWeatherEvent());
+                        context.read<WeatherBloc>().add(
+                              WeatherGetWeekWeatherEvent(),
+                            );
+                      },
+                      child: SingleChildScrollView(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/icons/cloud.png',
+                                height: height * .35,
+                              ),
+                              Text(
+                                'Something went wrong...',
+                                textAlign: TextAlign.center,
+                                style: Fonts.msgTextStyle.copyWith(
                                   color: Colors.white,
                                 ),
                               ),
                             ],
-                            flexibleSpace: Stack(
-                              children: [
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        state.city,
-                                        textAlign: TextAlign.center,
-                                        style: Fonts.headerTextStyle.copyWith(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Text(
-                                        state.country,
-                                        textAlign: TextAlign.center,
-                                        style: Fonts.msgTextStyle.copyWith(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Last update:',
-                                            textAlign: TextAlign.center,
-                                            style: Fonts.msgTextStyle.copyWith(
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${DateFormat('MMMEd').format(state.lastUpdate)}, ',
-                                            textAlign: TextAlign.center,
-                                            style: Fonts.msgTextStyle.copyWith(
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            DateFormat('HH:mm')
-                                                .format(state.lastUpdate),
-                                            textAlign: TextAlign.center,
-                                            style: Fonts.msgTextStyle.copyWith(
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ];
-                      },
-                      body: RefreshIndicator(
-                        color: Colors.white,
-                        backgroundColor: Colors.black,
-                        onRefresh: () async {
-                          context
-                              .read<WeatherBloc>()
-                              .add(WeatherGetWeatherEvent());
-                          context
-                              .read<WeatherBloc>()
-                              .add(WeatherGet24hWeatherEvent());
-                          context.read<WeatherBloc>().add(
-                                WeatherGetWeekWeatherEvent(),
-                              );
-                        },
-                        child: SingleChildScrollView(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/icons/cloud.png',
-                                  height: height * .35,
-                                ),
-                                Text(
-                                  'Something went wrong...',
-                                  textAlign: TextAlign.center,
-                                  style: Fonts.msgTextStyle.copyWith(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
                       ),
-                    );
-                  });
+                    ),
+                  );
                 }
                 return Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/icons/cloud.png',
-                        height: height * .35,
-                      ),
-                      const CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                    ],
+                  child: Image.asset(
+                    'assets/icons/cloud.png',
+                    height: height * .35,
                   ),
                 );
               }

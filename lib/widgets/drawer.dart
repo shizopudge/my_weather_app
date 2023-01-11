@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_weather_app/bloc/local/local_bloc.dart';
-import 'package:my_weather_app/bloc/locations/locations_bloc.dart';
+import 'package:my_weather_app/bloc/location/location_bloc.dart';
 import 'package:my_weather_app/bloc/settings/settings_bloc.dart';
+import 'package:my_weather_app/bloc/sqflite/sqflite_bloc.dart';
+import 'package:my_weather_app/bloc/sqflite/sqflite_state.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/constants/font.dart';
+import 'package:my_weather_app/edit_locations_screen.dart';
 import 'package:my_weather_app/settings_screen.dart';
 
 class LeftDrawer extends StatelessWidget {
@@ -25,9 +28,9 @@ class LeftDrawer extends StatelessWidget {
               bottomRight: Radius.circular(21),
             ),
           ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: SingleChildScrollView(
               child: Column(
                 children: [
                   Stack(
@@ -160,79 +163,132 @@ class LeftDrawer extends StatelessWidget {
                     ],
                   ),
                   const Divider(),
-                  BlocBuilder<LocationsBloc, LocationsState>(
+                  BlocBuilder<SqfliteBloc, SqfliteState>(
                     builder: ((context, state) {
                       final locations = state.locations ?? [];
                       final favoriteLocations = state.favoriteLocations ?? [];
                       if (state.isLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        return const CircularProgressIndicator(
+                          color: Colors.white,
                         );
                       } else {
-                        return Column(
-                          children: [
-                            Text(
-                              'Favorite locations',
-                              textAlign: TextAlign.center,
-                              style: Fonts.msgTextStyle.copyWith(fontSize: 21),
-                            ),
-                            if (favoriteLocations.isEmpty)
-                              Text(
-                                'No favorite locations',
-                                textAlign: TextAlign.center,
-                                style: Fonts.msgTextStyle.copyWith(
-                                  fontSize: 16,
+                        return BlocConsumer<LocationBloc, LocationState>(
+                          listenWhen: (previous, current) {
+                            return ((previous.cityName != current.cityName) &&
+                                !current.isLoading);
+                          },
+                          listener: (context, state) {
+                            context
+                                .read<WeatherBloc>()
+                                .add(WeatherGetWeatherEvent());
+                            context.read<WeatherBloc>().add(
+                                  WeatherGet24hWeatherEvent(),
+                                );
+                            context.read<WeatherBloc>().add(
+                                  WeatherGetWeekWeatherEvent(),
+                                );
+                          },
+                          builder: (context, state) {
+                            return Column(
+                              children: [
+                                Text(
+                                  'Favorite location',
+                                  textAlign: TextAlign.center,
+                                  style:
+                                      Fonts.msgTextStyle.copyWith(fontSize: 21),
                                 ),
-                              ),
-                            if (favoriteLocations.isNotEmpty)
-                              ...favoriteLocations.map(
-                                (location) => ListTile(
-                                  title: Text(
-                                    location.city ?? '',
+                                if (favoriteLocations.isEmpty)
+                                  Text(
+                                    'No favorite location',
                                     textAlign: TextAlign.center,
-                                    style: Fonts.headerTextStyle
-                                        .copyWith(fontSize: 16),
+                                    style: Fonts.msgTextStyle.copyWith(
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                  subtitle: Text(
-                                    location.country ?? '',
-                                    textAlign: TextAlign.center,
-                                    style: Fonts.msgTextStyle
-                                        .copyWith(fontSize: 14),
+                                if (favoriteLocations.isNotEmpty)
+                                  ...favoriteLocations.map(
+                                    (location) => ListTile(
+                                      onTap: () {
+                                        context.read<LocationBloc>().add(
+                                              LocationSetCityEvent(
+                                                  location.country ?? '',
+                                                  location.city ?? ''),
+                                            );
+                                      },
+                                      title: Text(
+                                        location.city ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.headerTextStyle
+                                            .copyWith(fontSize: 16),
+                                      ),
+                                      subtitle: Text(
+                                        location.country ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle
+                                            .copyWith(fontSize: 14),
+                                      ),
+                                    ),
                                   ),
+                                const Divider(),
+                                Column(
+                                  children: [
+                                    Text(
+                                      'Another locations',
+                                      textAlign: TextAlign.center,
+                                      style: Fonts.msgTextStyle
+                                          .copyWith(fontSize: 21),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const EditLocationsScreen(),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Edit locations',
+                                        style: Fonts.msgTextStyle
+                                            .copyWith(fontSize: 14),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            const Divider(),
-                            Text(
-                              'Another locations',
-                              textAlign: TextAlign.center,
-                              style: Fonts.msgTextStyle.copyWith(fontSize: 21),
-                            ),
-                            if (locations.isEmpty)
-                              Text(
-                                'No locations',
-                                textAlign: TextAlign.center,
-                                style: Fonts.msgTextStyle.copyWith(
-                                  fontSize: 16,
-                                ),
-                              ),
-                            if (locations.isNotEmpty)
-                              ...locations.map(
-                                (location) => ListTile(
-                                  title: Text(
-                                    location.city ?? '',
+                                if (locations.isEmpty)
+                                  Text(
+                                    'No locations',
                                     textAlign: TextAlign.center,
-                                    style: Fonts.headerTextStyle
-                                        .copyWith(fontSize: 16),
+                                    style: Fonts.msgTextStyle.copyWith(
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                  subtitle: Text(
-                                    location.country ?? '',
-                                    textAlign: TextAlign.center,
-                                    style: Fonts.msgTextStyle
-                                        .copyWith(fontSize: 14),
+                                if (locations.isNotEmpty)
+                                  ...locations.map(
+                                    (location) => ListTile(
+                                      onTap: () {
+                                        context.read<LocationBloc>().add(
+                                              LocationSetCityEvent(
+                                                  location.country ?? '',
+                                                  location.city ?? ''),
+                                            );
+                                      },
+                                      title: Text(
+                                        location.city ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.headerTextStyle
+                                            .copyWith(fontSize: 16),
+                                      ),
+                                      subtitle: Text(
+                                        location.country ?? '',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle
+                                            .copyWith(fontSize: 14),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                          ],
+                              ],
+                            );
+                          },
                         );
                       }
                     }),

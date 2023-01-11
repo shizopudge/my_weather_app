@@ -19,10 +19,11 @@ class SplashScreen extends StatelessWidget {
       backgroundColor: theme == 'light' ? Colors.white : Colors.black,
       body: SafeArea(
         child: BlocConsumer<LocalBloc, LocalState>(
+          listenWhen: (previous, current) {
+            return (!current.isLoading && !isImagesPreloading);
+          },
           listener: (context, state) {
-            if (state.isFirstLaunch &&
-                !state.isLoading &&
-                !isImagesPreloading) {
+            if (state.isFirstLaunch) {
               Future.delayed(
                 const Duration(seconds: 1),
                 (() => Navigator.pushReplacement(
@@ -32,9 +33,7 @@ class SplashScreen extends StatelessWidget {
                       ),
                     )),
               );
-            } else if (!state.isFirstLaunch &&
-                !state.isLoading &&
-                !isImagesPreloading) {
+            } else if (!state.isFirstLaunch) {
               Future.delayed(
                 const Duration(seconds: 1),
                 (() => Navigator.pushReplacement(

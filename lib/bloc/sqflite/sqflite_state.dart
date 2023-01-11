@@ -1,22 +1,22 @@
-part of 'locations_bloc.dart';
+import 'package:my_weather_app/models/location_model.dart';
 
-class LocationsState {
+class SqfliteState {
   final bool isLoading;
   final List<LocationModel>? favoriteLocations;
   final List<LocationModel>? locations;
 
-  LocationsState({
+  SqfliteState({
     this.isLoading = false,
     this.favoriteLocations = const [],
     this.locations = const [],
   });
 
-  LocationsState copyWith({
+  SqfliteState copyWith({
     bool isLoading = false,
     List<LocationModel>? favoriteLocations,
     List<LocationModel>? locations,
   }) {
-    return LocationsState(
+    return SqfliteState(
       isLoading: isLoading,
       favoriteLocations: favoriteLocations ?? this.favoriteLocations,
       locations: locations ?? this.locations,

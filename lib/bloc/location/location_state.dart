@@ -1,6 +1,6 @@
-part of 'city_bloc.dart';
+part of 'location_bloc.dart';
 
-class CityState {
+class LocationState {
   final List<CityModel> cities;
   final List<CityModel>? searchedCities;
   final String? cityName;
@@ -8,7 +8,7 @@ class CityState {
   final bool isLoading;
   final bool isError;
 
-  CityState({
+  LocationState({
     this.cities = const [],
     this.searchedCities = const [],
     this.cityName,
@@ -17,7 +17,7 @@ class CityState {
     this.isError = false,
   });
 
-  CityState copyWith({
+  LocationState copyWith({
     List<CityModel>? cities,
     List<CityModel>? searchedCities,
     String? cityName,
@@ -25,7 +25,7 @@ class CityState {
     bool isLoading = false,
     bool isError = false,
   }) {
-    return CityState(
+    return LocationState(
       cities: cities ?? this.cities,
       searchedCities: searchedCities ?? this.searchedCities,
       cityName: cityName ?? this.cityName,

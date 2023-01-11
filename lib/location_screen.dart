@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_weather_app/bloc/city/city_bloc.dart';
 import 'package:my_weather_app/bloc/local/local_bloc.dart';
-import 'package:my_weather_app/bloc/locations/locations_bloc.dart';
+import 'package:my_weather_app/bloc/sqflite/sqflite_bloc.dart';
+import 'package:my_weather_app/bloc/sqflite/sqflite_event.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/constants/font.dart';
 import 'package:my_weather_app/widgets/location_widget.dart';
+
+import 'bloc/location/location_bloc.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -33,7 +35,8 @@ class _LocationScreenState extends State<LocationScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: BlocConsumer<CityBloc, CityState>(listenWhen: (previous, current) {
+      body: BlocConsumer<LocationBloc, LocationState>(
+          listenWhen: (previous, current) {
         return (previous.cityName != current.cityName);
       }, listener: (context, state) {
         if (!state.isLoading) {
@@ -44,7 +47,6 @@ class _LocationScreenState extends State<LocationScreen> {
           context.read<WeatherBloc>().add(
                 WeatherGetWeekWeatherEvent(),
               );
-          context.read<LocationsBloc>().add(LocationsGetLocationsEvent());
         }
       }, builder: (context, state) {
         final cities = state.searchedCities ?? [];
@@ -69,8 +71,8 @@ class _LocationScreenState extends State<LocationScreen> {
                               borderRadius: BorderRadius.circular(21),
                               onTap: () {
                                 _searchController.clear();
-                                context.read<CityBloc>().add(
-                                      CitySearchLocationEvent(
+                                context.read<LocationBloc>().add(
+                                      LocationSearchLocationEvent(
                                         '',
                                       ),
                                     );
@@ -106,14 +108,14 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                     onChanged: ((value) {
                       if (value.isNotEmpty) {
-                        context.read<CityBloc>().add(
-                              CitySearchLocationEvent(
+                        context.read<LocationBloc>().add(
+                              LocationSearchLocationEvent(
                                 value,
                               ),
                             );
                       } else {
-                        context.read<CityBloc>().add(
-                              CitySearchLocationEvent(
+                        context.read<LocationBloc>().add(
+                              LocationSearchLocationEvent(
                                 value,
                               ),
                             );
@@ -180,13 +182,13 @@ class _LocationScreenState extends State<LocationScreen> {
                                 ? InkWell(
                                     borderRadius: BorderRadius.circular(21),
                                     onTap: () {
-                                      context.read<CityBloc>().add(
-                                            CitySetCityEvent(
+                                      context.read<LocationBloc>().add(
+                                            LocationSetCityEvent(
                                                 city.countryName ?? '',
                                                 city.cityName ?? ''),
                                           );
-                                      context.read<LocationsBloc>().add(
-                                            LocationsOnSetLocationEvent(
+                                      context.read<SqfliteBloc>().add(
+                                            SqfliteOnSetLocationEvent(
                                               city.cityName ?? '',
                                               city.countryName ?? '',
                                             ),
@@ -202,12 +204,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                       InkWell(
                                         borderRadius: BorderRadius.circular(21),
                                         onTap: () {
-                                          context.read<CityBloc>().add(
-                                              CitySetCityEvent(
+                                          context.read<LocationBloc>().add(
+                                              LocationSetCityEvent(
                                                   city.countryName ?? '',
                                                   city.cityName ?? ''));
-                                          context.read<LocationsBloc>().add(
-                                                LocationsOnSetLocationEvent(
+                                          context.read<SqfliteBloc>().add(
+                                                SqfliteOnSetLocationEvent(
                                                   city.cityName ?? '',
                                                   city.countryName ?? '',
                                                 ),

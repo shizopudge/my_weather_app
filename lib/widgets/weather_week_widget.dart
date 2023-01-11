@@ -42,7 +42,7 @@ class WeatherWeekWeidget extends StatelessWidget {
                     Row(
                       children: [
                         const Icon(
-                          Icons.water_drop_outlined,
+                          Icons.water_drop,
                           color: Colors.blue,
                         ),
                         Text(
