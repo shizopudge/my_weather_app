@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:intl/intl.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/bloc/weather/weather_state.dart';
 import 'package:my_weather_app/models/location_model.dart';
@@ -67,6 +69,13 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         throw Exception('Something went wrong');
       }
     } on Exception catch (e) {
+      emit(
+        state.copyWith(
+          isError: true,
+          city: city,
+          country: country,
+        ),
+      );
       throw Exception('$e');
     }
   }
@@ -81,6 +90,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     emit(state.copyWith(isLoading: true));
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? city = prefs.getString('city');
+    final String? country = prefs.getString('country');
     final String? units = prefs.getString('units');
     final List<WeatherModel> weather24hList = [];
     const int count = 9;
@@ -104,7 +114,11 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         ));
       } else {
         emit(
-          state.copyWith(isError: true),
+          state.copyWith(
+            isError: true,
+            city: city,
+            country: country,
+          ),
         );
         throw Exception('Something went wrong');
       }
@@ -112,6 +126,8 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
       emit(
         state.copyWith(
           isError: true,
+          city: city,
+          country: country,
         ),
       );
       throw Exception('Something went wrong ($e)');
@@ -120,9 +136,9 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
 
   Future _onGetWeekWeather(
       WeatherGetWeekWeatherEvent event, Emitter<WeatherState> emit) async {
-    emit(state.copyWith(isLoading: true));
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? city = prefs.getString('city');
+    final String? country = prefs.getString('country');
     final String? units = prefs.getString('units');
     final List<WeatherModel> weatherWeekList = [];
     final List<WeatherWeekModel> returnWeatherWeekList = [];
@@ -232,13 +248,21 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         ));
       } else {
         emit(
-          state.copyWith(isError: true),
+          state.copyWith(
+            isError: true,
+            city: city,
+            country: country,
+          ),
         );
         throw Exception('Something went wrong');
       }
     } on Exception catch (e) {
       emit(
-        state.copyWith(isError: true),
+        state.copyWith(
+          isError: true,
+          city: city,
+          country: country,
+        ),
       );
       throw Exception('Something went wrong ($e)');
     }
@@ -284,6 +308,18 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
             isLoading: false,
             lastUpdate: DateTime.now(),
           ));
+          await HomeWidget.saveWidgetData<String>(
+              '_temp', WeatherModel.fromJson(res.data).temp ?? '');
+          await HomeWidget.saveWidgetData<String>('_city', city ?? '');
+          await HomeWidget.saveWidgetData<String>(
+            '_updated',
+            DateFormat('dd.MM HH:mm').format(
+              DateTime.fromMillisecondsSinceEpoch(
+                  (WeatherModel.fromJson(res.data).dt ?? 0) * 1000),
+            ),
+          );
+          await HomeWidget.updateWidget(
+              name: 'AppWidgetProvider', iOSName: 'AppWidgetProvider');
         } else {
           emit(
             state.copyWith(
@@ -336,6 +372,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     emit(state.copyWith(isLoading: true));
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? city = prefs.getString('city');
+    final String? country = prefs.getString('country');
     final String? units = prefs.getString('units');
     final List<WeatherModel> weather24hList = [];
     const int count = 9;
@@ -373,7 +410,11 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
           ));
         } else {
           emit(
-            state.copyWith(isError: true),
+            state.copyWith(
+              isError: true,
+              city: city,
+              country: country,
+            ),
           );
           throw Exception('Something went wrong');
         }
@@ -381,6 +422,8 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         emit(
           state.copyWith(
             isError: true,
+            city: city,
+            country: country,
           ),
         );
         throw Exception('Something went wrong ($e)');
@@ -406,7 +449,11 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
           ));
         } else {
           emit(
-            state.copyWith(isError: true),
+            state.copyWith(
+              isError: true,
+              city: city,
+              country: country,
+            ),
           );
           throw Exception('Something went wrong');
         }
@@ -414,6 +461,8 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         emit(
           state.copyWith(
             isError: true,
+            city: city,
+            country: country,
           ),
         );
         throw Exception('Something went wrong ($e)');
@@ -426,6 +475,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     emit(state.copyWith(isLoading: true));
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? city = prefs.getString('city');
+    final String? country = prefs.getString('country');
     final String? units = prefs.getString('units');
     final List<WeatherModel> weatherWeekList = [];
     final List<WeatherWeekModel> returnWeatherWeekList = [];
@@ -551,13 +601,21 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
           ));
         } else {
           emit(
-            state.copyWith(isError: true),
+            state.copyWith(
+              isError: true,
+              city: city,
+              country: country,
+            ),
           );
           throw Exception('Something went wrong');
         }
       } on Exception catch (e) {
         emit(
-          state.copyWith(isError: true),
+          state.copyWith(
+            isError: true,
+            city: city,
+            country: country,
+          ),
         );
         throw Exception('Something went wrong ($e)');
       }
@@ -669,20 +727,37 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
           ));
         } else {
           emit(
-            state.copyWith(isError: true),
+            state.copyWith(
+              isError: true,
+              city: city,
+              country: country,
+            ),
           );
           throw Exception('Something went wrong');
         }
       } on Exception catch (e) {
         emit(
-          state.copyWith(isError: true),
+          state.copyWith(
+            isError: true,
+            city: city,
+            country: country,
+          ),
         );
         throw Exception('Something went wrong ($e)');
       }
     }
   }
 
-  _onError(WeatherOnErrorEvent event, Emitter<WeatherState> emit) {
-    emit(state.copyWith(isError: true));
+  _onError(WeatherOnErrorEvent event, Emitter<WeatherState> emit) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? city = prefs.getString('city');
+    final String? country = prefs.getString('country');
+    emit(
+      state.copyWith(
+        isError: true,
+        city: city,
+        country: country,
+      ),
+    );
   }
 }

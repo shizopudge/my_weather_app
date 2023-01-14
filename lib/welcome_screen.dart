@@ -14,93 +14,164 @@ class WelcomeScreen extends StatelessWidget {
         context.select<LocalBloc, String>((value) => value.state.theme);
     return Scaffold(
       backgroundColor: theme == 'light' ? Colors.white : Colors.black,
-      body: BlocConsumer<LocalBloc, LocalState>(listener: ((context, state) {
-        if (state.isFirstLaunch == false && !state.isLoading) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ),
-          );
-        }
-      }), builder: (context, state) {
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.blue.shade800, Colors.blueGrey.shade800],
-            ),
-          ),
-          child: SafeArea(
-            child: Align(
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Stack(
+      body: BlocConsumer<LocalBloc, LocalState>(
+        listener: ((context, state) {
+          if (state.isFirstLaunch == false && !state.isLoading) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            );
+          }
+        }),
+        builder: (context, state) {
+          if (state.isLoading && !state.isFirstLaunch) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.blue.shade800, Colors.blueGrey.shade800],
+                ),
+              ),
+              child: SafeArea(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Stack(
                     alignment: Alignment.center,
                     children: [
                       Image.asset(
                         'assets/icons/cloud.png',
                         height: height * .3,
                       ),
-                      if (state.isLoading)
-                        const CircularProgressIndicator()
-                      else
-                        const SizedBox(),
+                      const CircularProgressIndicator()
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      !state.isLoading
-                          ? 'Hi, thanks for installing my weather forecast app, press continue to start!'
-                          : 'Loading...',
-                      textAlign: TextAlign.center,
-                      style: Fonts.msgTextStyle.copyWith(color: Colors.white),
-                    ),
+                ),
+              ),
+            );
+          }
+          if (state.isLoading && state.isFirstLaunch) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.blue.shade800, Colors.blueGrey.shade800],
+                ),
+              ),
+              child: SafeArea(
+                child: Center(
+                  child: Image.asset(
+                    'assets/icons/cloud.png',
+                    height: height * .3,
                   ),
-                  if (!state.isLoading)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: InkWell(
-                        radius: 120,
-                        borderRadius: BorderRadius.circular(21),
-                        onTap: () {
-                          context
-                              .read<LocalBloc>()
-                              .add(LocalSetLaunchStateEvent());
-                        },
-                        onLongPress: () {},
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(21),
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.pink.shade300,
-                                Colors.indigo.shade300,
-                              ],
+                ),
+              ),
+            );
+          }
+          if (!state.isLoading && state.isFirstLaunch) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.blue.shade800, Colors.blueGrey.shade800],
+                ),
+              ),
+              child: SafeArea(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/icons/cloud.png',
+                        height: height * .3,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Hi, thanks for installing my weather forecast app, press continue to start!',
+                          textAlign: TextAlign.center,
+                          style:
+                              Fonts.msgTextStyle.copyWith(color: Colors.white),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Use geolocation?',
+                              textAlign: TextAlign.center,
+                              style: Fonts.msgTextStyle.copyWith(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
-                          ),
-                          padding: const EdgeInsets.all(12),
-                          child: Text(
-                            'Continue',
-                            style: Fonts.msgTextStyle.copyWith(
-                              color: Colors.white,
+                            Checkbox(
+                              value: state.isFirstLaunchWithGeo,
+                              side: const BorderSide(
+                                color: Colors.white,
+                              ),
+                              onChanged: (value) {
+                                context.read<LocalBloc>().add(
+                                      LocalSetFirstLaunchGeo(value ?? false),
+                                    );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: InkWell(
+                          radius: 120,
+                          borderRadius: BorderRadius.circular(21),
+                          onTap: () {
+                            context.read<LocalBloc>().add(
+                                  LocalSetLaunchStateEvent(
+                                      state.isFirstLaunchWithGeo),
+                                );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(21),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.pink.shade300,
+                                  Colors.indigo.shade300,
+                                ],
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(12),
+                            child: Text(
+                              'Continue',
+                              style: Fonts.msgTextStyle.copyWith(
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                  else
-                    const SizedBox(),
-                ],
+                      )
+                    ],
+                  ),
+                ),
               ),
+            );
+          }
+          return Center(
+            child: Image.asset(
+              'assets/icons/cloud.png',
+              height: height * .3,
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

@@ -14,11 +14,13 @@ class LocationWidget extends StatelessWidget {
     return ListTile(
       title: Text(
         city.cityName ?? '',
-        style: Fonts.msgTextStyle,
+        style: Fonts.msgTextStyle.copyWith(
+          color: Colors.white,
+        ),
       ),
       subtitle: Text(
         city.countryName ?? '',
-        style: Fonts.msgTextStyle,
+        style: Fonts.msgTextStyle.copyWith(color: Colors.grey.shade400),
       ),
     );
   }

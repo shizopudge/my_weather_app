@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_weather_app/bloc/local/local_bloc.dart';
 import 'package:my_weather_app/bloc/sqflite/sqflite_bloc.dart';
 import 'package:my_weather_app/bloc/sqflite/sqflite_event.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/constants/font.dart';
 import 'package:my_weather_app/widgets/location_widget.dart';
-
 import 'bloc/location/location_bloc.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -28,17 +26,11 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme =
-        context.select<LocalBloc, String>((value) => value.state.theme);
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: BlocConsumer<LocationBloc, LocationState>(
-          listenWhen: (previous, current) {
+    return BlocConsumer<LocationBloc, LocationState>(
+      listenWhen: (previous, current) {
         return (previous.cityName != current.cityName);
-      }, listener: (context, state) {
+      },
+      listener: (context, state) {
         if (!state.isLoading) {
           context.read<WeatherBloc>().add(WeatherGetWeatherEvent());
           context.read<WeatherBloc>().add(
@@ -47,194 +39,234 @@ class _LocationScreenState extends State<LocationScreen> {
           context.read<WeatherBloc>().add(
                 WeatherGetWeekWeatherEvent(),
               );
+          if (state.isGeoDetermined) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Successfully added current location!',
+                  textAlign: TextAlign.center,
+                  style: Fonts.msgTextStyle.copyWith(fontSize: 14),
+                ),
+              ),
+            );
+          }
+          if (state.isError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Sorry, probably something went wrong while we tried to determine your location...',
+                  textAlign: TextAlign.center,
+                  style: Fonts.msgTextStyle.copyWith(fontSize: 14),
+                ),
+              ),
+            );
+          }
         }
-      }, builder: (context, state) {
+      },
+      builder: (context, state) {
         final cities = state.searchedCities ?? [];
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextFormField(
-                    controller: _searchController,
-                    style: Fonts.msgTextStyle.copyWith(
-                      color: Colors.white,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey.shade900,
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? InkWell(
-                              radius: 24,
-                              borderRadius: BorderRadius.circular(21),
-                              onTap: () {
-                                _searchController.clear();
-                                context.read<LocationBloc>().add(
-                                      LocationSearchLocationEvent(
-                                        '',
-                                      ),
-                                    );
-                              },
-                              child: const Icon(
-                                Icons.cancel_sharp,
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            automaticallyImplyLeading: state.isLoading ? false : true,
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: state.isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Column(
+                      children: [
+                        if (!state.isLoading)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              controller: _searchController,
+                              style: Fonts.msgTextStyle.copyWith(
                                 color: Colors.white,
                               ),
-                            )
-                          : null,
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(21),
-                        borderSide: const BorderSide(
-                          color: Colors.transparent,
-                          width: 1.5,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(21),
-                        borderSide: const BorderSide(
-                          color: Colors.transparent,
-                          width: 1.5,
-                        ),
-                      ),
-                      hintText: 'Search',
-                      hintStyle: Fonts.msgTextStyle.copyWith(
-                        color: Colors.white,
-                      ),
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Colors.white,
-                      ),
-                    ),
-                    onChanged: ((value) {
-                      if (value.isNotEmpty) {
-                        context.read<LocationBloc>().add(
-                              LocationSearchLocationEvent(
-                                value,
-                              ),
-                            );
-                      } else {
-                        context.read<LocationBloc>().add(
-                              LocationSearchLocationEvent(
-                                value,
-                              ),
-                            );
-                      }
-                    }),
-                  ),
-                ),
-                if (state.isLoading)
-                  const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                if (!state.isLoading &&
-                    cities.isEmpty &&
-                    _searchController.text.isNotEmpty)
-                  Column(
-                    children: [
-                      Image.asset(
-                        'assets/icons/cloud.png',
-                        height: 120,
-                      ),
-                      const Text(
-                        'Nothing found...',
-                        textAlign: TextAlign.center,
-                        style: Fonts.msgTextStyle,
-                      )
-                    ],
-                  ),
-                if (!state.isLoading && _searchController.text.isEmpty)
-                  Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Add current loaction',
-                          style: Fonts.msgTextStyle,
-                        ),
-                      ),
-                      Image.asset(
-                        'assets/icons/cloud.png',
-                        height: 120,
-                      ),
-                      const Text(
-                        'Enter location name.',
-                        textAlign: TextAlign.center,
-                        style: Fonts.msgTextStyle,
-                      )
-                    ],
-                  ),
-                if (!state.isLoading &&
-                    cities.isNotEmpty &&
-                    _searchController.text.isNotEmpty)
-                  Expanded(
-                    child: Card(
-                      color: theme == 'dark'
-                          ? Colors.grey.shade900
-                          : Colors.grey.shade300,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ListView.builder(
-                          itemCount: cities.length,
-                          itemBuilder: ((context, index) {
-                            final city = cities[index];
-                            return index == (cities.length - 1)
-                                ? InkWell(
-                                    borderRadius: BorderRadius.circular(21),
-                                    onTap: () {
-                                      context.read<LocationBloc>().add(
-                                            LocationSetCityEvent(
-                                                city.countryName ?? '',
-                                                city.cityName ?? ''),
-                                          );
-                                      context.read<SqfliteBloc>().add(
-                                            SqfliteOnSetLocationEvent(
-                                              city.cityName ?? '',
-                                              city.countryName ?? '',
-                                            ),
-                                          );
-                                      Navigator.pop(context);
-                                    },
-                                    child: LocationWidget(
-                                      city: city,
-                                    ),
-                                  )
-                                : Column(
-                                    children: [
-                                      InkWell(
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.grey.shade900,
+                                suffixIcon: _searchController.text.isNotEmpty
+                                    ? InkWell(
+                                        radius: 24,
                                         borderRadius: BorderRadius.circular(21),
                                         onTap: () {
+                                          _searchController.clear();
                                           context.read<LocationBloc>().add(
-                                              LocationSetCityEvent(
-                                                  city.countryName ?? '',
-                                                  city.cityName ?? ''));
-                                          context.read<SqfliteBloc>().add(
-                                                SqfliteOnSetLocationEvent(
-                                                  city.cityName ?? '',
-                                                  city.countryName ?? '',
+                                                LocationSearchLocationEvent(
+                                                  '',
                                                 ),
                                               );
-                                          Navigator.pop(context);
                                         },
-                                        child: LocationWidget(
-                                          city: city,
+                                        child: const Icon(
+                                          Icons.cancel_sharp,
+                                          color: Colors.white,
                                         ),
-                                      ),
-                                      const Divider(
-                                        thickness: 1.5,
-                                      ),
-                                    ],
-                                  );
-                          }),
-                        ),
-                      ),
+                                      )
+                                    : null,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(21),
+                                  borderSide: const BorderSide(
+                                    color: Colors.transparent,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(21),
+                                  borderSide: const BorderSide(
+                                    color: Colors.transparent,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                hintText: 'Search',
+                                hintStyle: Fonts.msgTextStyle.copyWith(
+                                  color: Colors.white,
+                                ),
+                                prefixIcon: const Icon(
+                                  Icons.search,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              onChanged: ((value) {
+                                if (value.isNotEmpty) {
+                                  context.read<LocationBloc>().add(
+                                        LocationSearchLocationEvent(
+                                          value,
+                                        ),
+                                      );
+                                } else {
+                                  context.read<LocationBloc>().add(
+                                        LocationSearchLocationEvent(
+                                          value,
+                                        ),
+                                      );
+                                }
+                              }),
+                            ),
+                          ),
+                        if (!state.isLoading &&
+                            cities.isEmpty &&
+                            _searchController.text.isNotEmpty)
+                          Column(
+                            children: [
+                              Image.asset(
+                                'assets/icons/cloud.png',
+                                height: 120,
+                              ),
+                              const Text(
+                                'Nothing found...',
+                                textAlign: TextAlign.center,
+                                style: Fonts.msgTextStyle,
+                              )
+                            ],
+                          ),
+                        if (!state.isLoading && _searchController.text.isEmpty)
+                          Column(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  context
+                                      .read<LocationBloc>()
+                                      .add(LocationGetCurrentLocationEvent());
+                                },
+                                child: const Text(
+                                  'Add current loaction',
+                                  style: Fonts.msgTextStyle,
+                                ),
+                              ),
+                              Image.asset(
+                                'assets/icons/cloud.png',
+                                height: 120,
+                              ),
+                              const Text(
+                                'Enter location name.',
+                                textAlign: TextAlign.center,
+                                style: Fonts.msgTextStyle,
+                              )
+                            ],
+                          ),
+                        if (!state.isLoading &&
+                            cities.isNotEmpty &&
+                            _searchController.text.isNotEmpty)
+                          Expanded(
+                            child: Card(
+                              color: Colors.grey.shade900,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: ListView.builder(
+                                  itemCount: cities.length,
+                                  itemBuilder: ((context, index) {
+                                    final city = cities[index];
+                                    return index == (cities.length - 1)
+                                        ? InkWell(
+                                            borderRadius:
+                                                BorderRadius.circular(21),
+                                            onTap: () {
+                                              context.read<LocationBloc>().add(
+                                                    LocationSetCityEvent(
+                                                        city.countryName ?? '',
+                                                        city.cityName ?? ''),
+                                                  );
+                                              context.read<SqfliteBloc>().add(
+                                                    SqfliteOnSetLocationEvent(
+                                                      city.cityName ?? '',
+                                                      city.countryName ?? '',
+                                                    ),
+                                                  );
+                                              Navigator.pop(context);
+                                            },
+                                            child: LocationWidget(
+                                              city: city,
+                                            ),
+                                          )
+                                        : Column(
+                                            children: [
+                                              InkWell(
+                                                borderRadius:
+                                                    BorderRadius.circular(21),
+                                                onTap: () {
+                                                  context
+                                                      .read<LocationBloc>()
+                                                      .add(LocationSetCityEvent(
+                                                          city.countryName ??
+                                                              '',
+                                                          city.cityName ?? ''));
+                                                  context
+                                                      .read<SqfliteBloc>()
+                                                      .add(
+                                                        SqfliteOnSetLocationEvent(
+                                                          city.cityName ?? '',
+                                                          city.countryName ??
+                                                              '',
+                                                        ),
+                                                      );
+                                                  Navigator.pop(context);
+                                                },
+                                                child: LocationWidget(
+                                                  city: city,
+                                                ),
+                                              ),
+                                              const Divider(
+                                                thickness: 1.5,
+                                              ),
+                                            ],
+                                          );
+                                  }),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  ),
-              ],
             ),
           ),
         );
-      }),
+      },
     );
   }
 }

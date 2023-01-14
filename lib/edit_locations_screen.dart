@@ -8,7 +8,6 @@ import 'package:my_weather_app/bloc/sqflite/sqflite_state.dart';
 import 'package:my_weather_app/bloc/weather/weather_bloc.dart';
 import 'package:my_weather_app/bloc/weather/weather_event.dart';
 import 'package:my_weather_app/constants/font.dart';
-import 'package:my_weather_app/location_screen.dart';
 
 class EditLocationsScreen extends StatelessWidget {
   const EditLocationsScreen({
@@ -21,24 +20,6 @@ class EditLocationsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          InkWell(
-            radius: 100,
-            borderRadius: BorderRadius.circular(21),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: ((context) => const LocationScreen()),
-                ),
-              );
-            },
-            child: const Icon(
-              Icons.add_rounded,
-              size: 32,
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: BlocConsumer<SqfliteBloc, SqfliteState>(
@@ -139,16 +120,6 @@ class EditLocationsScreen extends StatelessWidget {
                             fontSize: 20,
                             color: Colors.grey.shade600,
                           ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'Add current loaction',
-                          style: Fonts.msgTextStyle,
                         ),
                       ),
                     ),

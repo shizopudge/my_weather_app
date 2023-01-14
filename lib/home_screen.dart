@@ -22,8 +22,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
-    final theme =
-        context.select<LocalBloc, String>((value) => value.state.theme);
+    final theme = context.select<LocalBloc, String>((bloc) => bloc.state.theme);
     return Scaffold(
       drawer: const LeftDrawer(),
       body: Container(

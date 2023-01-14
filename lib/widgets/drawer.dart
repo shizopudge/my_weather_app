@@ -191,11 +191,83 @@ class LeftDrawer extends StatelessWidget {
                           builder: (context, state) {
                             return Column(
                               children: [
-                                Text(
-                                  'Favorite location',
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      Fonts.msgTextStyle.copyWith(fontSize: 21),
+                                Stack(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Favorite location',
+                                        textAlign: TextAlign.center,
+                                        style: Fonts.msgTextStyle
+                                            .copyWith(fontSize: 21),
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: InkWell(
+                                        onTap: () => showDialog(
+                                          context: context,
+                                          builder: ((context) {
+                                            return SimpleDialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(21),
+                                              ),
+                                              titlePadding:
+                                                  const EdgeInsets.only(
+                                                      top: 10),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 25,
+                                                vertical: 10,
+                                              ),
+                                              title: const Text(
+                                                'Favorite location',
+                                                textAlign: TextAlign.center,
+                                                style: Fonts.msgTextStyle,
+                                              ),
+                                              children: [
+                                                Text(
+                                                  'Favorite location would be used in home screen widget and always prioritet show when app is launched.',
+                                                  textAlign: TextAlign.justify,
+                                                  style: Fonts.msgTextStyle
+                                                      .copyWith(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 12),
+                                                  child: ElevatedButton(
+                                                    onPressed: () =>
+                                                        Navigator.of(context)
+                                                            .pop(),
+                                                    child: const Text(
+                                                      'Ok',
+                                                      style: Fonts.msgTextStyle,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }),
+                                        ),
+                                        radius: 16,
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.grey.shade400,
+                                          radius: 12,
+                                          child: const Icon(
+                                            Icons.question_mark_rounded,
+                                            size: 16,
+                                            color: Colors.indigo,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 if (favoriteLocations.isEmpty)
                                   Text(

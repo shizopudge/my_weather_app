@@ -4,6 +4,8 @@ abstract class LocationEvent {}
 
 class LocationGetCititesEvent extends LocationEvent {}
 
+class LocationGetCurrentLocationEvent extends LocationEvent {}
+
 class LocationSearchLocationEvent extends LocationEvent {
   final String query;
 

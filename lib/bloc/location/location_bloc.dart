@@ -1,9 +1,14 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:my_weather_app/models/geo_location_model.dart';
+import 'package:my_weather_app/models/location_model.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_weather_app/models/city_model.dart';
 import 'package:my_weather_app/models/country_model.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 part 'location_event.dart';
@@ -25,9 +30,16 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       ),
     );
     on<LocationSetCityEvent>(_onSetCity);
+    on<LocationGetCurrentLocationEvent>(_onGetCurrentLocation);
   }
 
-  final _httpClient = Dio();
+  final _httpClient = Dio(
+    BaseOptions(
+      connectTimeout: 15000,
+      receiveTimeout: 10000,
+    ),
+  );
+
   Future _onGetCitites(
       LocationGetCititesEvent event, Emitter<LocationState> emit) async {
     emit(LocationState(isLoading: true));
@@ -108,5 +120,140 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         countryName: event.countryName,
       ),
     );
+  }
+
+  _onGetCurrentLocation(LocationGetCurrentLocationEvent event,
+      Emitter<LocationState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.unableToDetermine ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.unableToDetermine ||
+          permission == LocationPermission.deniedForever) {
+        return;
+      }
+    }
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      emit(state.copyWith(isLoading: true));
+      final currentPosition = await Geolocator.getCurrentPosition();
+      final res = await _httpClient.get(
+          'https://api.geoapify.com/v1/geocode/reverse?lat=${currentPosition.latitude}&lon=${currentPosition.longitude}&apiKey=0de2b91f45964cea8ab3ab92d27939b2');
+      if (res.statusCode == 200) {
+        final geo = GeoModel.fromJson(res.data);
+        if (geo.city != null && geo.country != null) {
+          prefs.setString('city', geo.city ?? '');
+          prefs.setString('country', geo.country ?? '');
+          bool isOkToInsert = true;
+          final db = await openDatabase(
+            join(await getDatabasesPath(), 'locations.db'),
+          );
+          final List<Map<String, dynamic>> locationsMaps =
+              await db.query('locations');
+          final List<Map<String, dynamic>> favoriteLocationsMaps =
+              await db.query('favorite_locations');
+          List<LocationModel> locations =
+              List.generate(locationsMaps.length, (i) {
+            return LocationModel(
+              id: locationsMaps[i]['id'],
+              city: locationsMaps[i]['city'],
+              country: locationsMaps[i]['country'],
+            );
+          });
+          List<LocationModel> favoriteLocations =
+              List.generate(favoriteLocationsMaps.length, (i) {
+            return LocationModel(
+              id: favoriteLocationsMaps[i]['id'],
+              city: favoriteLocationsMaps[i]['city'],
+              country: favoriteLocationsMaps[i]['country'],
+            );
+          });
+          if (locations.length == 5) {
+            for (var location in locations) {
+              if (location.city == geo.city &&
+                  location.country == geo.country) {
+                isOkToInsert = false;
+              }
+            }
+            for (var location in favoriteLocations) {
+              if (location.city == geo.city &&
+                  location.country == geo.country) {
+                isOkToInsert = false;
+              }
+            }
+            if (isOkToInsert) {
+              await db.delete(
+                'locations',
+                where: 'id = ?',
+                whereArgs: [
+                  locations.first.id,
+                ],
+              );
+              await db.insert(
+                'locations',
+                LocationModel(
+                  city: geo.city,
+                  country: geo.country,
+                ).toMap(),
+                conflictAlgorithm: ConflictAlgorithm.ignore,
+              );
+            }
+            emit(
+              state.copyWith(
+                isLoading: false,
+                isGeoDetermined: true,
+                cityName: geo.city ?? '',
+                countryName: geo.country ?? '',
+              ),
+            );
+          } else {
+            for (var location in locations) {
+              if (location.city == geo.city &&
+                  location.country == geo.country) {
+                isOkToInsert = false;
+              }
+            }
+            for (var location in favoriteLocations) {
+              if (location.city == geo.city &&
+                  location.country == geo.country) {
+                isOkToInsert = false;
+              }
+            }
+            if (isOkToInsert) {
+              await db.insert(
+                'locations',
+                LocationModel(
+                  city: geo.city,
+                  country: geo.country,
+                ).toMap(),
+                conflictAlgorithm: ConflictAlgorithm.ignore,
+              );
+            }
+            emit(
+              state.copyWith(
+                isLoading: false,
+                isGeoDetermined: true,
+                cityName: geo.city ?? '',
+                countryName: geo.country ?? '',
+              ),
+            );
+          }
+        } else {
+          prefs.setString('city', 'Error');
+          prefs.setString('country', 'Error');
+          emit(
+            state.copyWith(
+              isLoading: false,
+              isError: true,
+              cityName: 'Error',
+              countryName: 'Error',
+            ),
+          );
+        }
+      }
+    }
   }
 }
