@@ -312,8 +312,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
           await HomeWidget.saveWidgetData<String>(
             '_updated',
             DateFormat('dd.MM HH:mm').format(
-              DateTime.fromMillisecondsSinceEpoch(
-                  (WeatherModel.fromJson(res.data).dt ?? 0) * 1000),
+              DateTime.now(),
             ),
           );
           await HomeWidget.updateWidget(
