@@ -32,6 +32,7 @@ final _httpClient = Dio(
   ),
 );
 
+@pragma('vm:entry-point')
 Future backgroundCallback(uri) async {
   final db = await openDatabase(
     join(await getDatabasesPath(), 'locations.db'),
