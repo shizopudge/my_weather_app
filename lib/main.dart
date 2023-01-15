@@ -64,13 +64,6 @@ Future backgroundCallback(uri) async {
           '${WeatherModel.fromJson(res.data).weatherMain}/${WeatherModel.fromJson(res.data).weatherDescription}');
       await HomeWidget.saveWidgetData<String>(
           '_city', favoriteLocations.first.city ?? '');
-      // await HomeWidget.saveWidgetData<String>(
-      //   '_updated',
-      //   DateFormat('dd.MM HH:mm').format(
-      //     DateTime.fromMillisecondsSinceEpoch(
-      //         (WeatherModel.fromJson(res.data).dt ?? 0) * 1000),
-      //   ),
-      // );
       await HomeWidget.saveWidgetData<String>(
         '_updated',
         DateFormat('dd.MM HH:mm').format(
