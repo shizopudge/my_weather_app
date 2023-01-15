@@ -5,9 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.widget.ImageView
-import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.module.AppGlideModule
-import com.bumptech.glide.Glide;
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
@@ -24,25 +21,31 @@ class AppWidgetProvider : HomeWidgetProvider() {
                         MainActivity::class.java)
                 setOnClickPendingIntent(R.id.widget_root, pendingIntent)
 
-                val temp = widgetData.getString("_temp", "No data")
+                val temp = widgetData.getString("_temp", "")
 
-                var tempText = "$temp"
+                var tempText = "$temp°"
 
-                val city = widgetData.getString("_city", "No data")
+                val city = widgetData.getString("_city", "")
 
                 var cityText = "$city"
 
-                val updated = widgetData.getString("_updated", "No data")
+                val updated = widgetData.getString("_updated", "No favorite location")
 
                 var updatedText = "Upd: $updated"
 
-                if (temp == "" || city == "" || updated == ""){
+                val description = widgetData.getString("_description", "")
+
+                var descriptionText = "$description"
+
+                if (temp == "" || city == "" || updated == "" || description == ""){
                     tempText = ""
                     cityText = ""
+                    descriptionText = ""
                     updatedText = "No favorite location"
                 }
 
                 setTextViewText(R.id.tv_temp, tempText)
+                setTextViewText(R.id.tv_description, descriptionText)
                 setTextViewText(R.id.tv_city, cityText)
                 setTextViewText(R.id.tv_updated, updatedText)
                 val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(context,

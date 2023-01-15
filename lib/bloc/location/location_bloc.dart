@@ -254,6 +254,17 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           );
         }
       }
+    } else {
+      prefs.setString('city', 'Error');
+      prefs.setString('country', 'Error');
+      emit(
+        state.copyWith(
+          isLoading: false,
+          isError: true,
+          cityName: 'Error',
+          countryName: 'Error',
+        ),
+      );
     }
   }
 }

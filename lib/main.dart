@@ -60,13 +60,21 @@ Future backgroundCallback(uri) async {
     if (res.statusCode == 200) {
       await HomeWidget.saveWidgetData<String>(
           '_temp', WeatherModel.fromJson(res.data).temp ?? '');
+      await HomeWidget.saveWidgetData<String>('_description',
+          '${WeatherModel.fromJson(res.data).weatherMain}/${WeatherModel.fromJson(res.data).weatherDescription}');
       await HomeWidget.saveWidgetData<String>(
           '_city', favoriteLocations.first.city ?? '');
+      // await HomeWidget.saveWidgetData<String>(
+      //   '_updated',
+      //   DateFormat('dd.MM HH:mm').format(
+      //     DateTime.fromMillisecondsSinceEpoch(
+      //         (WeatherModel.fromJson(res.data).dt ?? 0) * 1000),
+      //   ),
+      // );
       await HomeWidget.saveWidgetData<String>(
         '_updated',
         DateFormat('dd.MM HH:mm').format(
-          DateTime.fromMillisecondsSinceEpoch(
-              (WeatherModel.fromJson(res.data).dt ?? 0) * 1000),
+          DateTime.now(),
         ),
       );
       await HomeWidget.updateWidget(
@@ -76,6 +84,7 @@ Future backgroundCallback(uri) async {
     }
   } else {
     await HomeWidget.saveWidgetData<String>('_temp', '');
+    await HomeWidget.saveWidgetData<String>('_description', '');
     await HomeWidget.saveWidgetData<String>('_city', '');
     await HomeWidget.saveWidgetData<String>('_updated', '');
     await HomeWidget.updateWidget(

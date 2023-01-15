@@ -80,11 +80,6 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
     }
   }
 
-  _onSetUnits(WeatherSetUnitsEvent event, Emitter<WeatherState> emit) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('units', event.units);
-  }
-
   Future _onGet24hWeather(
       WeatherGet24hWeatherEvent event, Emitter<WeatherState> emit) async {
     emit(state.copyWith(isLoading: true));
@@ -310,7 +305,10 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
           ));
           await HomeWidget.saveWidgetData<String>(
               '_temp', WeatherModel.fromJson(res.data).temp ?? '');
-          await HomeWidget.saveWidgetData<String>('_city', city ?? '');
+          await HomeWidget.saveWidgetData<String>('_description',
+              '${WeatherModel.fromJson(res.data).weatherMain}/${WeatherModel.fromJson(res.data).weatherDescription}');
+          await HomeWidget.saveWidgetData<String>(
+              '_city', favoriteLocations.first.city ?? '');
           await HomeWidget.saveWidgetData<String>(
             '_updated',
             DateFormat('dd.MM HH:mm').format(
@@ -746,6 +744,11 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState> {
         throw Exception('Something went wrong ($e)');
       }
     }
+  }
+
+  _onSetUnits(WeatherSetUnitsEvent event, Emitter<WeatherState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('units', event.units);
   }
 
   _onError(WeatherOnErrorEvent event, Emitter<WeatherState> emit) async {

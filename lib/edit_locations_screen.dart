@@ -28,10 +28,10 @@ class EditLocationsScreen extends StatelessWidget {
                 !current.isLoading);
           }),
           listener: (context, state) {
-            context.read<WeatherBloc>().add(WeatherGetWeatherEvent());
-            context.read<WeatherBloc>().add(WeatherGet24hWeatherEvent());
+            context.read<WeatherBloc>().add(WeatherInitGetWeatherEvent());
+            context.read<WeatherBloc>().add(WeatherInitGet24hWeatherEvent());
             context.read<WeatherBloc>().add(
-                  WeatherGetWeekWeatherEvent(),
+                  WeatherInitGetWeekWeatherEvent(),
                 );
           },
           builder: (context, state) {
