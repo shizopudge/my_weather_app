@@ -228,7 +228,7 @@ class LeftDrawer extends StatelessWidget {
                                               ),
                                               children: [
                                                 Text(
-                                                  'Favorite location would be used in home screen widget and always prioritet show when app is launched.',
+                                                  'Favorite location would be used in home screen widget, notifications and always prioritet show when app is launched.',
                                                   textAlign: TextAlign.justify,
                                                   style: Fonts.msgTextStyle
                                                       .copyWith(

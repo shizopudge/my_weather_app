@@ -107,7 +107,7 @@ class HomeWeatherWidget extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${DateFormat('MMMEd').format(DateTime.fromMillisecondsSinceEpoch((weather.dt ?? 0) * 1000))}, ',
+                            '${DateFormat('MMMEd').format(DateTime.now())}, ',
                             textAlign: TextAlign.center,
                             style: Fonts.msgTextStyle.copyWith(
                               fontSize: 14,
@@ -116,8 +116,8 @@ class HomeWeatherWidget extends StatelessWidget {
                           ),
                           Text(
                             DateFormat('HH:mm').format(
-                                DateTime.fromMillisecondsSinceEpoch(
-                                    (weather.dt ?? 0) * 1000)),
+                              DateTime.now(),
+                            ),
                             textAlign: TextAlign.center,
                             style: Fonts.msgTextStyle.copyWith(
                               fontSize: 14,

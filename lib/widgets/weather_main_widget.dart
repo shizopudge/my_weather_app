@@ -42,14 +42,23 @@ class WeatherMainWidget extends StatelessWidget {
                     currentWeather.cityName ?? '',
                     style: Fonts.msgTextStyle.copyWith(fontSize: 21),
                   ),
-                  Text(
-                    'Weather updated at ${DateFormat('HH:mm').format(
-                      DateTime.fromMillisecondsSinceEpoch(
-                          (currentWeather.dt ?? 0) * 1000),
-                    )}',
-                    style: Fonts.msgTextStyle.copyWith(
-                      fontSize: 12,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        '${DateFormat('MMMEd').format(DateTime.now())}, ',
+                        textAlign: TextAlign.center,
+                        style: Fonts.msgTextStyle.copyWith(
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        DateFormat('HH:mm').format(DateTime.now()),
+                        textAlign: TextAlign.center,
+                        style: Fonts.msgTextStyle.copyWith(
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

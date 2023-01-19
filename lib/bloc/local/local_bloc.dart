@@ -17,6 +17,7 @@ class LocalBloc extends Bloc<LocalEvent, LocalState> {
     on<LocalGetLaunchStateEvent>(_onGetLaunchState);
     on<LocalSetThemeStateEvent>(_onSetThemeState);
     on<LocalSetFirstLaunchGeo>(_onSetFirstLaunchGeoState);
+    // on<LocalSetupNotificationsEvent>(_onSetupNotifications);
   }
   final _httpClient = Dio(
     BaseOptions(
@@ -184,4 +185,94 @@ class LocalBloc extends Bloc<LocalEvent, LocalState> {
       ),
     );
   }
+
+  // _onSetupNotifications(
+  //     LocalSetupNotificationsEvent event, Emitter<LocalState> emit) async {
+  //   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  //       FlutterLocalNotificationsPlugin();
+  //   AndroidInitializationSettings androidInitialize =
+  //       const AndroidInitializationSettings('@drawable/ic_launcher');
+  //   DarwinInitializationSettings iosInitialize =
+  //       const DarwinInitializationSettings();
+  //   InitializationSettings initializationsSetting =
+  //       InitializationSettings(android: androidInitialize, iOS: iosInitialize);
+  //   await flutterLocalNotificationsPlugin.initialize(initializationsSetting);
+  //   AndroidNotificationDetails androidPlatformChannelSpecifics =
+  //       const AndroidNotificationDetails(
+  //     'AndroidNoti',
+  //     'Weather Forecast',
+  //     importance: Importance.max,
+  //     priority: Priority.max,
+  //   );
+  //   final platformChannelSpecifics = NotificationDetails(
+  //     android: androidPlatformChannelSpecifics,
+  //     iOS: const DarwinNotificationDetails(),
+  //   );
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   final isFirstLaunch = prefs.getBool('isFirstLaunch');
+  //   if (isFirstLaunch ?? true) {
+  //     return;
+  //   } else {
+  //     final db = await openDatabase(
+  //       join(await getDatabasesPath(), 'locations.db'),
+  //     );
+  //     tz.initializeTimeZones();
+  //     final String timeZone = await FlutterNativeTimezone.getLocalTimezone();
+  //     tz.setLocalLocation(tz.getLocation(timeZone));
+  //     final List<Map<String, dynamic>> favoriteLocationsMaps =
+  //         await db.query('favorite_locations');
+  //     List<LocationModel> favoriteLocations =
+  //         List.generate(favoriteLocationsMaps.length, (i) {
+  //       return LocationModel(
+  //         id: favoriteLocationsMaps[i]['id'],
+  //         city: favoriteLocationsMaps[i]['city'],
+  //         country: favoriteLocationsMaps[i]['country'],
+  //       );
+  //     });
+  //     if (favoriteLocations.isNotEmpty) {
+  //       final String? units = prefs.getString('units');
+  //       final Response res = await _httpClient.get(
+  //           'https://api.openweathermap.org/data/2.5/weather',
+  //           queryParameters: {
+  //             'q': favoriteLocations.first.city,
+  //             'units': units,
+  //             'appid': '476834e607173de250e2b4595cc852af',
+  //           });
+  //       if (res.statusCode == 200) {
+  //         final WeatherModel weather = WeatherModel.fromJson(res.data);
+  //         tz.TZDateTime convertTime(int hour, int minutes) {
+  //           final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+  //           tz.TZDateTime scheduleDate = tz.TZDateTime(
+  //             tz.local,
+  //             now.year,
+  //             now.month,
+  //             now.day,
+  //             hour,
+  //             minutes,
+  //           );
+  //           if (scheduleDate.isBefore(now)) {
+  //             scheduleDate = scheduleDate.add(
+  //               const Duration(days: 1),
+  //             );
+  //           }
+  //           return scheduleDate;
+  //         }
+
+  //         await flutterLocalNotificationsPlugin.zonedSchedule(
+  //           1,
+  //           '${weather.temp}° ${weather.cityName}',
+  //           '${weather.weatherMain}/${weather.weatherDescription}\n${weather.tempMax}°/${weather.tempMin}°',
+  //           convertTime(7, 0),
+  //           platformChannelSpecifics,
+  //           uiLocalNotificationDateInterpretation:
+  //               UILocalNotificationDateInterpretation.absoluteTime,
+  //           androidAllowWhileIdle: true,
+  //           matchDateTimeComponents: DateTimeComponents.time,
+  //         );
+  //       } else {
+  //         throw Exception('Something went wrong');
+  //       }
+  //     }
+  //   }
+  // }
 }

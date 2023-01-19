@@ -113,14 +113,11 @@ class WelcomeScreen extends StatelessWidget {
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            Checkbox(
+                            Switch.adaptive(
                               value: state.isFirstLaunchWithGeo,
-                              side: const BorderSide(
-                                color: Colors.white,
-                              ),
                               onChanged: (value) {
                                 context.read<LocalBloc>().add(
-                                      LocalSetFirstLaunchGeo(value ?? false),
+                                      LocalSetFirstLaunchGeo(value),
                                     );
                               },
                             ),

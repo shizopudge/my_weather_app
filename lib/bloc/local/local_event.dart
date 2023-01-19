@@ -11,6 +11,8 @@ class LocalSetLaunchStateEvent extends LocalEvent {
 
 class LocalGetLaunchStateEvent extends LocalEvent {}
 
+class LocalSetupNotificationsEvent extends LocalEvent {}
+
 class LocalSetFirstLaunchGeo extends LocalEvent {
   final bool value;
 

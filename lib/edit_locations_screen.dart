@@ -39,9 +39,7 @@ class EditLocationsScreen extends StatelessWidget {
             final favoriteLocations = state.favoriteLocations ?? [];
             if (state.isLoading) {
               return const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
+                child: CircularProgressIndicator(),
               );
             } else {
               return Padding(
