@@ -110,6 +110,8 @@ class BackgroundServices {
         autoStart: true,
         autoStartOnBoot: true,
         isForegroundMode: true,
+        initialNotificationContent: '',
+        initialNotificationTitle: 'Weather Forecast Sevices',
       ),
       iosConfiguration: IosConfiguration(
         autoStart: true,

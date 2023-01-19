@@ -12,8 +12,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    final theme =
-        context.select<LocalBloc, String>((value) => value.state.theme);
+    final theme = context.select<LocalBloc, String>((bloc) => bloc.state.theme);
     return Scaffold(
       body: SafeArea(
         child: NestedScrollView(
@@ -118,64 +117,58 @@ class SettingsScreen extends StatelessWidget {
                       const Divider(
                         thickness: 1.5,
                       ),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Theme',
-                                style: Fonts.headerTextStyle.copyWith(
-                                  color: Colors.white,
-                                ),
-                              ),
-                              theme == 'light'
-                                  ? const Icon(
-                                      Icons.sunny,
-                                      size: 32,
-                                      color: Colors.indigo,
-                                    )
-                                  : const Icon(
-                                      Icons.nightlight,
-                                      size: 32,
-                                      color: Colors.indigo,
-                                    ),
-                            ],
+                          Text(
+                            'Theme',
+                            style: Fonts.headerTextStyle.copyWith(
+                              color: Colors.white,
+                            ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Dark',
-                                style: Fonts.msgTextStyle.copyWith(
-                                  color: theme == 'dark'
-                                      ? Colors.indigo
-                                      : Colors.grey,
+                          theme == 'light'
+                              ? const Icon(
+                                  Icons.sunny,
+                                  size: 32,
+                                  color: Colors.indigo,
+                                )
+                              : const Icon(
+                                  Icons.nightlight,
+                                  size: 32,
+                                  color: Colors.indigo,
                                 ),
-                              ),
-                              Switch.adaptive(
-                                inactiveTrackColor: Colors.indigo,
-                                activeTrackColor: Colors.indigo,
-                                inactiveThumbColor: Colors.indigoAccent,
-                                activeColor: Colors.indigoAccent,
-                                value: theme == 'light',
-                                onChanged: (value) {
-                                  context.read<LocalBloc>().add(
-                                        LocalSetThemeStateEvent(theme == 'light'
-                                            ? 'dark'
-                                            : 'light'),
-                                      );
-                                },
-                              ),
-                              Text(
-                                'Light',
-                                style: Fonts.msgTextStyle.copyWith(
-                                  color: theme == 'light'
-                                      ? Colors.indigo
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Dark',
+                            style: Fonts.msgTextStyle.copyWith(
+                              color:
+                                  theme == 'dark' ? Colors.indigo : Colors.grey,
+                            ),
+                          ),
+                          Switch.adaptive(
+                            inactiveTrackColor: Colors.indigo,
+                            activeTrackColor: Colors.indigo,
+                            inactiveThumbColor: Colors.indigoAccent,
+                            activeColor: Colors.indigoAccent,
+                            value: theme == 'light',
+                            onChanged: (value) {
+                              context.read<LocalBloc>().add(
+                                    LocalSetThemeStateEvent(
+                                        theme == 'light' ? 'dark' : 'light'),
+                                  );
+                            },
+                          ),
+                          Text(
+                            'Light',
+                            style: Fonts.msgTextStyle.copyWith(
+                              color: theme == 'light'
+                                  ? Colors.indigo
+                                  : Colors.grey,
+                            ),
                           ),
                         ],
                       ),
