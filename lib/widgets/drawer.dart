@@ -110,6 +110,7 @@ class LeftDrawer extends StatelessWidget {
                                           context.read<WeatherBloc>().add(
                                                 WeatherGetWeekWeatherEvent(),
                                               );
+                                          Scaffold.of(context).closeDrawer();
                                           break;
                                         case 1:
                                           const String units = 'imperial';
@@ -126,6 +127,7 @@ class LeftDrawer extends StatelessWidget {
                                           context.read<WeatherBloc>().add(
                                                 WeatherGetWeekWeatherEvent(),
                                               );
+                                          Scaffold.of(context).closeDrawer();
                                           break;
                                         default:
                                       }
@@ -187,6 +189,7 @@ class LeftDrawer extends StatelessWidget {
                             context.read<WeatherBloc>().add(
                                   WeatherGetWeekWeatherEvent(),
                                 );
+                            Scaffold.of(context).closeDrawer();
                           },
                           builder: (context, state) {
                             return Column(
